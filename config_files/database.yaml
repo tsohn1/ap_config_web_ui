@@ -1,0 +1,11 @@
+driver: "file" #"sqlite"
+fileName: "eslap.db"
+host: ""
+port: 0
+user: ""
+passwd: ""
+ssl: ""
+ipcKey: "Database"
+log: 'esl_db.log'
+databaseDir: /home/eslap-1118/eslap/db/ #/ramdisk/eslap/db/
+databaseBackupDir: /home/eslap-1118/eslap/db/

@@ -1,0 +1,55 @@
+configDir: /home/eslap-1118/eslap/config/
+certFile: /home/eslap-1118/eslap/cert/cert.pem
+templateDir: /home/eslap-1118/eslap/template/
+fontDir: /home/eslap-1118/eslap/static/fonts/
+externalBinaryDir: /home/eslap-1118/eslap/external/
+imageDir: /home/eslap-1118/eslap/static/images/
+dataBackupDir: /ramdisk/eslap/databackup/
+logDir: /ramdisk/eslap/log/
+tmpDir: /ramdisk/eslap/tmp/
+tagImageDir: /ramdisk/eslap/tag_images/
+
+logLevel: info
+apBrokerRetryTimingSecond: 120
+
+imageGenerationThreadCount: 3
+imageGenerationReqPort: "7505"
+imageGenerationRespPort: "7506"
+imageGenerationPubPort: "7507"
+eslapTimerReqPort: "7508"
+deassignThreadCount: 1
+
+fontFacePreloadCount: 3
+
+lastTaskIdBackupFile: lastTaskId.yaml
+productDataBackupFile: product.bk
+assignDataBackupFile: assign.bk
+nfcDataBackupFile: nfc.bk
+
+eventFrameTxTiming: 20 # event frame data tx timing prior to evt frame start in millisecond
+tagImageTxTimging: 15 # tag data tx timing prior to tag image info request timing in millisecond
+
+# Demo
+scanProfile: [10, 10, 10, 10, 10, 180]
+# Normal
+# scanProfile: [30, 30, 60, 120, 180, 900]
+
+# Demo
+backoffBase: 10 # [baseSeconds, mulFactor]
+backoffMulFactor: 1
+
+# Normal
+#backoffProfile: [100, 10] # [baseSeconds, mulFactor]
+
+freezerTagMultiplier: 1
+tagDistributionMinute: 3
+pageRotationMacPage: 1
+
+# Logging
+logMaxSizeMb: 10
+logMaxBackup: 30
+logMaxAgeDays: 30
+logCompress: true
+
+gRpcMaxSize: 104857600 # 100*1024*1024
+

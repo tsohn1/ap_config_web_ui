@@ -1,0 +1,13 @@
+siteId: "test"
+siteCode: 0x1118
+storeCode: "dev"
+ip: "192.168.1.186"
+defaultGwIp: "192.168.1.1"
+netmask: "255.255.255.0"
+nameServers: ["8.8.8.8", "8.8.4.4"]
+timeZone: "Asia/Seoul"
+timeServerUrls: ["1", "2", "3"]
+apBrokerUrl: "cloud.forseils.com:443"
+interApPort: "57778"
+interApPortTarget: "57779"
+ethernetInterface: "eth0"
