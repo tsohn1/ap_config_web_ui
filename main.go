@@ -10,6 +10,11 @@ import (
 
 )
 
+const (
+	YAML_FOLDER = "config_files/"
+	NETWORK_ENV = YAML_FOLDER + "network.yaml"
+)
+
 var network_env config.NetworkEnv
 func updateConfig(ctx *gin.Context) {
 
@@ -34,7 +39,7 @@ func main() {
 	// display YAML data in webpage
 	router.GET("/", func(ctx *gin.Context) {
 		//parse YAML from yaml directory
-		parsed_network_env, err := config.GetConfigEnv("config_files/network.yaml", &network_env)
+		parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
 		if err != nil {
 			fmt.Println("Error:", err)
 			os.Exit(1)
