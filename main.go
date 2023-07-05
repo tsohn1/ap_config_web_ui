@@ -7,7 +7,7 @@ import (
 	"os"
 	"github.com/gin-gonic/gin"
 	"github.com/fatih/structs"
-
+	"log"
 )
 
 const (
@@ -22,7 +22,7 @@ func updateConfig(ctx *gin.Context) {
 	formFields := ctx.Request.PostForm
 
 	for key, value := range formFields {
-			fmt.Println(key, value)
+			log.Println(key, value)
 	}
 	ctx.Redirect(http.StatusSeeOther, "/")
 }
@@ -38,6 +38,8 @@ func main() {
 
 	// display YAML data in webpage
 	router.GET("/", func(ctx *gin.Context) {
+		fmt.Println("GET")
+		log.Println("GET")
 		//parse YAML from yaml directory
 		parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
 		if err != nil {

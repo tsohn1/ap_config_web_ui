@@ -27,7 +27,7 @@
     {{range $name, $value := .YAMLData}}
       <div>
         <label for = "{{$name}}">{{$name}}</label>
-        <input type = "text" name = "{{$name}}" value = {{$value}}>
+        <input type = "text" id = "{{$name}}" value = {{$value}}>
       </div>
     {{end}}
     <div>
