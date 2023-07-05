@@ -5,26 +5,54 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
 	"github.com/gin-gonic/gin"
+	"github.com/fatih/structs"
 
 )
 
 var network_env config.NetworkEnv
+func updateConfig(ctx *gin.Context) {
+
+	//Retrieve all form fields
+	formFields := ctx.Request.PostForm
+
+	for key, value := range formFields {
+			fmt.Println(key, value)
+	}
+
+	ctx.Redirect(http.StatusAccepted, "/")
+	
+}
+
+
+
 
 func main() {
-	
+	//parse YAML from yaml directory
 	parsed_network_env, err := config.GetConfigEnv("config_files/network.yaml", &network_env)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(1)
 	}
 
+	//type assertion to networkenv
+	network_env_struct := parsed_network_env.(*config.NetworkEnv)
+
+	//change interface to map type to pass to html
+	network_env_map := structs.Map(network_env_struct)
+
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
+
+	// display YAML data in webpage
 	router.GET("/", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.html", parsed_network_env)
+		ctx.HTML(http.StatusOK, "index.html", gin.H{
+			"YAMLData" : network_env_map,
+		})
 	})
+
+	// write to YAML when form is submitted, update webpage as well
+	router.POST("/", updateConfig)
 
 	router.Run(":8080")
 

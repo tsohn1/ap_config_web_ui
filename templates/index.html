@@ -7,20 +7,32 @@
 </head>
 <body>
   <h1>AP Configuration</h1>
+  <div>Full YAML: {{.YAMLData}}</div>
   <ul>
-    <li>siteId: {{.SiteId}}</li>
-    <li>siteCode: {{.SiteCode}}</li>
-    <li>storeCode: {{.StoreCode}}</li>
-    <li>ip: {{.Ip}}</li>
-    <li>defaultGwIp: {{.DefaultGwIP}}</li>
-    <li>netmask: {{.Netmask}}</li>
-    <li>nameServers: {{.NameServers}}</li>
-    <li>timeZone: {{.TimeZone}}</li>
-    <li>timeServerUrls: {{.TimeServerUrls}}</li>
-    <li>apBrokerUrl: {{.ApBrokerUrl}}</li>
-    <li>interApPort: {{.InterApPort}}</li>
-    <li>interApPortTarget: {{.InterApPortTarget}}</li>
-    <li>ethernetInterface: {{.EthernetInterface}}</li>
+    <li>siteId: {{.YAMLData.SiteId}}</li>
+    <li>siteCode: {{.YAMLData.SiteCode}}</li>
+    <li>storeCode: {{.YAMLData.StoreCode}}</li>
+    <li>ip: {{.YAMLData.Ip}}</li>
+    <li>defaultGwIp: {{.YAMLData.DefaultGwIP}}</li>
+    <li>netmask: {{.YAMLData.Netmask}}</li>
+    <li>nameServers: {{.YAMLData.NameServers}}</li>
+    <li>timeZone: {{.YAMLData.TimeZone}}</li>
+    <li>timeServerUrls: {{.YAMLData.TimeServerUrls}}</li>
+    <li>apBrokerUrl: {{.YAMLData.ApBrokerUrl}}</li>
+    <li>interApPort: {{.YAMLData.InterApPort}}</li>
+    <li>interApPortTarget: {{.YAMLData.InterApPortTarget}}</li>
+    <li>ethernetInterface: {{.YAMLData.EthernetInterface}}</li>
   </ul>
+  <form method="POST" action="/">
+    {{range $name, $value := .YAMLData}}
+      <div>
+        <label for = "{{$name}}">{{$name}}</label>
+        <input type = "text" name = "{{$name}}" value = {{$value}}>
+      </div>
+    {{end}}
+    <div>
+      <button type = "submit">Save</button>
+    </div>
+  </form>
 </body>
 </html>
