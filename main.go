@@ -7,15 +7,14 @@ import (
 
 )
 
-var network_env *config.NetworkEnv
+var network_env config.NetworkEnv
 
 func main() {
-	network_env, err := config.GetConfigEnv("config_files/network.yaml", config.ConfigNetworkEnv)
+	parsed_network_env, err := config.GetConfigEnv("config_files/network.yaml", &network_env)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(1)
 	}
-	
-	fmt.Printf("%+v\n", network_env)
+	fmt.Printf("%+v\n", parsed_network_env)
 
 }
