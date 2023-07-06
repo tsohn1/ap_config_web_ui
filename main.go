@@ -19,7 +19,11 @@ const (
 var network_env config.NetworkEnv
 
 func updateConfig(ctx *gin.Context) {
-
+	err := ctx.Request.ParseForm()
+	if err != nil {
+		// Handle the error, possibly by returning an error response
+		return
+	}
 	//Retrieve all form fields
 	formFields := ctx.Request.PostForm
 	SiteCode, err := strconv.Atoi(formFields.Get("SiteCode"))

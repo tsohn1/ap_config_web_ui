@@ -29,13 +29,13 @@
         <label for = "{{$name}}">{{$name}}</label>
         {{if eq $name "SiteCode" }}
         <!-- accept numbers only -->
-          <input type = "number" id = "{{$name}}" value = {{$value}} min = "0" max = "4294967295" step = "1" required>
+          <input type = "number" name = "{{$name}}" id = "{{$name}}" value = {{$value}} min = "0" max = "4294967295" step = "1" required>
         {{else if or (eq $name "TimeServerUrls") (eq $name "NameServers")}}
         <!-- accept comma separated lists only -->
-          <input type = "text" id = "{{$name}}" value = {{$value}} pattern = "^\[\s*[\w\d]+\s*(?:,\s*[\w\d]+\s*)*\]" title = "Please enter a comma seperated list, example: [4, 2, 0]"  required>
+          <input type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} pattern = "^\[\s*[\w\d]+\s*(?:,\s*[\w\d]+\s*)*\]" title = "Please enter a comma seperated list, example: [4, 2, 0]"  required>
         {{else}}
         <!-- accept all strings -->
-          <input type = "text" id = "{{$name}}" value = {{$value}} required>
+          <input type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} required>
         {{end}}
       </div>
     {{end}}
