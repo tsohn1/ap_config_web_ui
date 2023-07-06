@@ -2,7 +2,6 @@ package main
 
 import (
 	"ap_config_web_ui/config"
-	"fmt"
 	"net/http"
 	"os"
 	"github.com/gin-gonic/gin"
@@ -38,12 +37,11 @@ func main() {
 
 	// display YAML data in webpage
 	router.GET("/", func(ctx *gin.Context) {
-		fmt.Println("GET")
 		log.Println("GET")
 		//parse YAML from yaml directory
 		parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
 		if err != nil {
-			fmt.Println("Error:", err)
+			log.Println("Error:", err)
 			os.Exit(1)
 		}
 
