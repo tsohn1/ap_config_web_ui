@@ -8,6 +8,7 @@ import (
 	"github.com/fatih/structs"
 	"log"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -24,28 +25,23 @@ func updateConfig(ctx *gin.Context) {
 		// Handle the error, possibly by returning an error response
 		return
 	}
+
 	//Retrieve all form fields
 	formFields := ctx.Request.PostForm
+
+	//convert SiteCode to uint32
 	SiteCode, err := strconv.Atoi(formFields.Get("SiteCode"))
+
 	if err != nil {
 		log.Println("Error:", err)
-		SiteCode = 1
+		os.Exit(1)
 	}
 
-	file, _ := os.OpenFile("form.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	defer file.Close()
-
-	log.SetOutput(file)
-	log.SetFlags(log.Flags() | log.LstdFlags)
-	log.Printf("start")
-	for key, values := range formFields {
-		log.Printf("printing key")
-		log.Printf("%s:\n", key)
-		for _, value := range values {
-			log.Printf("   printing value")
-			log.Printf("-s %s\n", value)
-		}
-	}
+	//convert NameServers, TimeserverUrls into []string
+	nameServerRaw := formFields.Get("NameServers")
+	timeServerRaw := formFields.Get("TimeServerUrls")
+	nameServerRaw = strings.Trim(nameServerRaw, "[]")
+	timeServerRaw = strings.Trim(timeServerRaw, "[]")
 
 	new_network_struct := config.NetworkEnv{   
 		SiteId : formFields.Get("SiteId"),
@@ -54,18 +50,21 @@ func updateConfig(ctx *gin.Context) {
 		Ip : formFields.Get("Ip"),                
 		DefaultGwIP : formFields.Get("DefaultGwIP"),       
 		Netmask : formFields.Get("Netmask"),           
-		NameServers : append(make([]string, 0), formFields.Get("NameServers")),       
+		NameServers : strings.Split(nameServerRaw, ","),       
 		TimeZone : formFields.Get("TimeZone"),          
-		TimeServerUrls : append(make([]string, 0), formFields.Get("TimeServerUrls")),    
+		TimeServerUrls : strings.Split(timeServerRaw, ","),    
 		InterApPort : formFields.Get("InterApPort"),       
 		InterApPortTarget : formFields.Get("InterApPortTarget"), 
 		ApBrokerUrl : formFields.Get("ApBrokerUrl"),       
 		EthernetInterface : formFields.Get("EthernetInterface")}
+
 	err = config.SetConfigEnv(NETWORK_ENV, &new_network_struct)
+
 	if err != nil {
 		log.Println("Error:", err)
 		os.Exit(1)
 	}
+
 	ctx.Redirect(http.StatusSeeOther, "/")
 }
 
