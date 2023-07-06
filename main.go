@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/fatih/structs"
 	"log"
+	"strconv"
 )
 
 const (
@@ -14,14 +15,52 @@ const (
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
 )
 
+
 var network_env config.NetworkEnv
+
 func updateConfig(ctx *gin.Context) {
 
 	//Retrieve all form fields
 	formFields := ctx.Request.PostForm
+	SiteCode, err := strconv.Atoi(formFields.Get("SiteCode"))
+	if err != nil {
+		log.Println("Error:", err)
+		SiteCode = 1
+	}
 
-	for key, value := range formFields {
-			log.Println(key, value)
+	file, _ := os.OpenFile("form.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	defer file.Close()
+
+	log.SetOutput(file)
+	log.SetFlags(log.Flags() | log.LstdFlags)
+	log.Printf("start")
+	for key, values := range formFields {
+		log.Printf("printing key")
+		log.Printf("%s:\n", key)
+		for _, value := range values {
+			log.Printf("   printing value")
+			log.Printf("-s %s\n", value)
+		}
+	}
+
+	new_network_struct := config.NetworkEnv{   
+		SiteId : formFields.Get("SiteId"),
+		SiteCode: uint32(SiteCode),
+		StoreCode: formFields.Get("StoreCode"),
+		Ip : formFields.Get("Ip"),                
+		DefaultGwIP : formFields.Get("DefaultGwIP"),       
+		Netmask : formFields.Get("Netmask"),           
+		NameServers : append(make([]string, 0), formFields.Get("NameServers")),       
+		TimeZone : formFields.Get("TimeZone"),          
+		TimeServerUrls : append(make([]string, 0), formFields.Get("TimeServerUrls")),    
+		InterApPort : formFields.Get("InterApPort"),       
+		InterApPortTarget : formFields.Get("InterApPortTarget"), 
+		ApBrokerUrl : formFields.Get("ApBrokerUrl"),       
+		EthernetInterface : formFields.Get("EthernetInterface")}
+	err = config.SetConfigEnv(NETWORK_ENV, &new_network_struct)
+	if err != nil {
+		log.Println("Error:", err)
+		os.Exit(1)
 	}
 	ctx.Redirect(http.StatusSeeOther, "/")
 }
