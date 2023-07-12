@@ -9,26 +9,11 @@
 <body>
   <div class = "container row-gap-3">
     <div class = "row container">
-      <h1>AP Configuration</h1>
+      <h1 class = "text-center">AP Configuration</h1>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <div class = "row container"> Full YAML: {{.YAMLData}}</div>
-    <ul class = "row container">
-      <li>siteId: {{.YAMLData.SiteId}}</li>
-      <li>siteCode: {{.YAMLData.SiteCode}}</li>
-      <li>storeCode: {{.YAMLData.StoreCode}}</li>
-      <li>ip: {{.YAMLData.Ip}}</li>
-      <li>defaultGwIp: {{.YAMLData.DefaultGwIP}}</li>
-      <li>netmask: {{.YAMLData.Netmask}}</li>
-      <li>nameServers: {{.YAMLData.NameServers}}</li>
-      <li>timeZone: {{.YAMLData.TimeZone}}</li>
-      <li>timeServerUrls: {{.YAMLData.TimeServerUrls}}</li>
-      <li>apBrokerUrl: {{.YAMLData.ApBrokerUrl}}</li>
-      <li>interApPort: {{.YAMLData.InterApPort}}</li>
-      <li>interApPortTarget: {{.YAMLData.InterApPortTarget}}</li>
-      <li>ethernetInterface: {{.YAMLData.EthernetInterface}}</li>
-    </ul>
+
     <form method="POST" action="/" class = "row container overflow-auto justify-content-md-center" >
       <div class = "row row-gap-3 gy-5">
         {{range $name, $value := .YAMLData}}

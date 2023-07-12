@@ -79,7 +79,6 @@ func main() {
 
 	// display YAML data in webpage
 	router.GET("/", func(ctx *gin.Context) {
-		log.Println("GET")
 		//parse YAML from yaml directory
 		parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
 		if err != nil {
