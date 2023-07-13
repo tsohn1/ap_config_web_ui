@@ -11,13 +11,14 @@ import (
 	"strings"
 	"google.golang.org/grpc"
 	"context"
+	"google.golang.org/grpc/credentials/insecure"
 	validate "ap_config_web_ui/validate"
 )
 
 const (
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
-	VALIDATE_YAML_CHANGES = true
+	VALIDATE_YAML_CHANGES = true //flag to validate YAML changes using gRPC
 	GRPC_SUCCESS_TOKEN = 1
 	GRPC_FAIL_TOKEN = 0
 )
@@ -92,7 +93,7 @@ func updateConfig(ctx *gin.Context) {
 func main() {
 
 	if VALIDATE_YAML_CHANGES {
-		conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+		conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			log.Fatalf("Failed to connect: %v", err)
 		}
