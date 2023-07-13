@@ -17,7 +17,7 @@ import (
 const (
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
-	VALIDATE_YAML_CHANGES = false
+	VALIDATE_YAML_CHANGES = true
 	GRPC_SUCCESS_TOKEN = 1
 	GRPC_FAIL_TOKEN = 0
 )
