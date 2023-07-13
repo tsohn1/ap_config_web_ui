@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package validate;
+
+service Validate {
+  rpc Verify(VerifyRequest) returns (VerifyResponse);
+}
+
+option go_package = "./validate";
+
+message VerifyRequest {
+  int32 token = 1;
+}
+
+message VerifyResponse {
+  bool is_valid = 1;
+}

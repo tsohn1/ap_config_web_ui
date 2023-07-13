@@ -9,15 +9,23 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"google.golang.org/grpc"
+	"context"
+	validate "ap_config_web_ui/validate"
 )
 
 const (
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
+	VALIDATE_YAML_CHANGES = false
+	GRPC_SUCCESS_TOKEN = 1
+	GRPC_FAIL_TOKEN = 0
 )
 
-
-var network_env config.NetworkEnv
+var (
+	network_env config.NetworkEnv
+	client validate.ValidateClient
+)
 
 func updateConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
@@ -64,7 +72,17 @@ func updateConfig(ctx *gin.Context) {
 		log.Println("Error:", err)
 		os.Exit(1)
 	}
-
+	if VALIDATE_YAML_CHANGES {
+		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN})
+		if err != nil {
+			log.Fatalf("Verify failed: %v", err)
+		}
+		if verResponse.IsValid {
+			log.Printf("Verify result: Valid")
+		} else {
+			log.Printf("Verify result: Invalid")
+		}
+	}
 	ctx.Redirect(http.StatusSeeOther, "/")
 }
 
@@ -73,7 +91,15 @@ func updateConfig(ctx *gin.Context) {
 
 func main() {
 
-
+	if VALIDATE_YAML_CHANGES {
+		conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+		if err != nil {
+			log.Fatalf("Failed to connect: %v", err)
+		}
+		defer conn.Close()
+		client = validate.NewValidateClient(conn)
+	}
+	
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 
