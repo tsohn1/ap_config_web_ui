@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Network YAML Configuration</title>
+  <title>Operation YAML Configuration</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 </head>
 <body>
@@ -22,26 +22,41 @@
       </div>
     </div>
   </nav>  
+  <div>Full YAML: {{.YAMLData.Data}}</div>
+  <div>Types: {{.YAMLData.Types}}</div>
+  <div>Indexing: {{$addddd := index .YAMLData.Types "ApBrokerRetryTimingSecond"}}{{$addddd}}</div>
+  <div>{{$wow := index .YAMLData.Types "AssignDataBackupFile"}}{{$addddd}}  {{$wow}}</div>
   <div class = "container row-gap-3 pt-5">
     <div class = "row container">
-      <h1 class = "text-center">Network YAML Configuration</h1>
+      <h1 class = "text-center">Operation YAML Configuration</h1>
     </div>
     
     
     <form method="POST" action="/network.html" class = "row container overflow-auto justify-content-md-center" >
       <div class = "row row-gap-3 gy-5">
-        {{range $name, $value := .YAMLData}}
+        {{range $name, $value := .YAMLData.Data}}
           <div class = "col-6 container ">
             <label class = "form-label" for = "{{$name}}">{{$name}}</label>
-            {{if eq $name "SiteCode" }}
-            <!-- accept numbers only -->
-              <input class = "form-control" type = "number" name = "{{$name}}" id = "{{$name}}" value = {{$value}} 
-              min = "0" max = "4294967295" step = "1" required>
-            {{else if or (eq $name "TimeServerUrls") (eq $name "NameServers")}}
+            
+            {{if eq $name "LogCompress"}}
+              {{if $value}}
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked>
+                <label class="form-check-label" for="flexCheckDefault">
+                </label>
+              {{else}}
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                </label>
+              {{end}}
+            <!--
+              replace with number case
+              accept numbers only
+            -->
+            {{else if eq $name "scanProfile"}}
             <!-- accept comma separated lists only -->
               <input class = "form-control"type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} 
-              pattern = "^\[\s*[\w\d.]+(?:\s+[\w\d.]+)*\s*\]$" 
-              title = "Please enter a space seperated list, example: [4 2 0]"  required>
+              pattern = "^\[\d+(?:\s+\d+){5}\]$" 
+              title = "Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]"  required>
             {{else}}
             <!-- accept all strings -->
               <input class = "form-control"type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} required>
