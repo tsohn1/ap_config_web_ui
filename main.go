@@ -28,7 +28,25 @@ var (
 	client validate.ValidateClient
 )
 
-func updateConfig(ctx *gin.Context) {
+func readNetworkConfig(ctx *gin.Context) {
+	//parse YAML from yaml directory
+	parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
+	if err != nil {
+		log.Println("Error:", err)
+		os.Exit(1)
+	}
+
+	//type assertion to networkenv
+	network_env_struct := parsed_network_env.(*config.NetworkEnv)
+
+	//change interface to map type to pass to html
+	network_env_map := structs.Map(network_env_struct)
+	ctx.HTML(http.StatusOK, "network.html", gin.H{
+		"YAMLData" : network_env_map,
+	})
+}
+
+func updateNetworkConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		// Handle the error, possibly by returning an error response
@@ -59,14 +77,14 @@ func updateConfig(ctx *gin.Context) {
 		Ip : formFields.Get("Ip"),                
 		DefaultGwIP : formFields.Get("DefaultGwIP"),       
 		Netmask : formFields.Get("Netmask"),           
-		NameServers : strings.Split(nameServerRaw, ","),       
+		NameServers : strings.Split(nameServerRaw, " "),       
 		TimeZone : formFields.Get("TimeZone"),          
-		TimeServerUrls : strings.Split(timeServerRaw, ","),    
+		TimeServerUrls : strings.Split(timeServerRaw, " "),    
 		InterApPort : formFields.Get("InterApPort"),       
 		InterApPortTarget : formFields.Get("InterApPortTarget"), 
 		ApBrokerUrl : formFields.Get("ApBrokerUrl"),       
-		EthernetInterface : formFields.Get("EthernetInterface")}
-
+		EthernetInterface : formFields.Get("EthernetInterface"),
+	}
 	err = config.SetConfigEnv(NETWORK_ENV, &new_network_struct)
 
 	if err != nil {
@@ -84,11 +102,13 @@ func updateConfig(ctx *gin.Context) {
 			log.Printf("Verify result: Invalid")
 		}
 	}
-	ctx.Redirect(http.StatusSeeOther, "/")
+	ctx.Redirect(http.StatusSeeOther, "/network.html")
 }
 
 
-
+func loadHomePage(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "index.html", nil)
+}
 
 func main() {
 
@@ -103,29 +123,21 @@ func main() {
 	
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
-
-	// display YAML data in webpage
+	//initial load
 	router.GET("/", func(ctx *gin.Context) {
-		//parse YAML from yaml directory
-		parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
-		if err != nil {
-			log.Println("Error:", err)
-			os.Exit(1)
-		}
-
-		//type assertion to networkenv
-		network_env_struct := parsed_network_env.(*config.NetworkEnv)
-
-		//change interface to map type to pass to html
-		network_env_map := structs.Map(network_env_struct)
-		ctx.HTML(http.StatusOK, "index.html", gin.H{
-			"YAMLData" : network_env_map,
-		})
+		ctx.Redirect(http.StatusSeeOther, "/index.html")
 	})
 
-	// write to YAML when form is submitted, update webpage as well
-	router.POST("/", updateConfig)
+	//homepage
+	router.GET("/index.html", loadHomePage)
 
+	// display network YAML data in webpage
+	router.GET("/network.html", readNetworkConfig)
+
+	// write to network YAML when form is submitted, update webpage as well
+	router.POST("/network.html", updateNetworkConfig)
+
+	
 	router.Run(":8080")
 
 }
