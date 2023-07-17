@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"github.com/gin-gonic/gin"
-	"github.com/fatih/structs"
 	"log"
 	"strconv"
 	"strings"
@@ -23,7 +22,7 @@ const (
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
 	OPERATION_ENV = YAML_FOLDER + "operation.yaml"
-	VALIDATE_YAML_CHANGES = true //flag to validate YAML changes using gRPC
+	VALIDATE_YAML_CHANGES = false //flag to validate YAML changes using gRPC
 	GRPC_SUCCESS_TOKEN = 1
 	GRPC_FAIL_TOKEN = 0
 )
@@ -32,51 +31,10 @@ var (
 	network_env config.NetworkEnv
 	operation_env config.OperationEnv
 	client validate.ValidateClient
-	operationFieldTypes = map[string]string{
-		"HomeDir" :           "string",
-		"ConfigDir" :         "string",
-		"CertFile" :          "string",
-		"LogDir" :            "string",
-		"TmpDir" :            "string",
-		"TagImageDir" :       "string",
-		"TemplateDir" :       "string",
-		"FontDir" :           "string",
-		"ImageDir" :          "string",
-		"ExternalBinaryDir" : "string",
-		"DataBackupDir" :     "string",
-		"LogLevel" :                  "string",
-		"ApBrokerRetryTimingSecond" : "int",
-		"ImgGenThreadCount" :         "int",
-		"ImgGenReqPort" :             "string",
-		"ImgGenRespPort" :            "string",
-		"ImgGenPubPort" :             "string",
-		"EslApTimerReqPort" :         "string",
-		"DeassignThreadCount" :       "int",
-		"FontFacePreloadCount" :      "int",
-		"LastTaskIdBackupFile" :  "string",
-		"ProductDataBackupFile" : "string",
-		"AssignDataBackupFile" :  "string",
-		"NfcDataBackupFile" :     "string",
-		"EventFrameTxTiming" :    "int",
-		"TagImageTxTimging" :     "int",
-		"ScanProfile" :           "[6]int",
-		"BackoffBase" :           "int",
-		"BackoffMulFactor" :      "int",
-		"FreezerTagMultiplier" :  "int",
-		"TagDistributionMinute" : "int",
-		"PageRotationMacPage" :   "int",
-		"LogMaxSizeMb" :  "int",
-		"LogMaxBackup" :  "int",
-		"LogMaxAgeDays" : "int",
-		"LogCompress" :   "bool",
-		"GRpcMaxSize" :   "int",
-	}
+
 )
 
-type OperationData struct {
-	Data  map[string]interface{}
-	Types map[string]string
-}
+
 
 func readNetworkConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
@@ -90,10 +48,8 @@ func readNetworkConfig(ctx *gin.Context) {
 	//type assertion to networkenv
 	network_env_struct := parsed_network_env.(*config.NetworkEnv)
 
-	//change interface to map type to pass to html
-	network_env_map := structs.Map(network_env_struct)
 	ctx.HTML(http.StatusOK, "network.html", gin.H{
-		"YAMLData" : network_env_map,
+		"YAMLData" : *network_env_struct,
 	})
 }
 
@@ -201,6 +157,8 @@ func generateHTMLForm(data interface{}) template.HTML {
 		switch value.Kind() {
 		case reflect.String:
 			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"text\" name=\"%s\" value=\"%s\">\n", fieldName, value.String())
+		case reflect.Uint32:
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\">\n", fieldName, value.Uint())
 		case reflect.Int:
 			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\">\n", fieldName, value.Int())
 		case reflect.Bool:
@@ -214,6 +172,10 @@ func generateHTMLForm(data interface{}) template.HTML {
 		case reflect.Array:
 			regex := regexp.MustCompile(`^\[\d+(?:\s+\d+){5}\]$`)
 			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" pattern = \"%s\" title = \"Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]\"  required>", 
+			fieldName, fieldName, value, regex)
+		case reflect.Slice:
+			regex := regexp.MustCompile(`^\[\s*[\w\d.]+(?:\s+[\w\d.]+)*\s*\]$`)
+			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" pattern = \"%s\" title = \"Please enter a space seperated list, example: [4 2 0]\"  required>", 
 			fieldName, fieldName, value, regex)
 		}
 		formHTML += "</div>"

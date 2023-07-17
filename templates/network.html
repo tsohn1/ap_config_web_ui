@@ -30,24 +30,7 @@
     
     <form method="POST" action="/network.html" class = "row container overflow-auto justify-content-md-center" >
       <div class = "row row-gap-3 gy-5">
-        {{range $name, $value := .YAMLData}}
-          <div class = "col-6 container ">
-            <label class = "form-label" for = "{{$name}}">{{$name}}</label>
-            {{if eq $name "SiteCode" }}
-            <!-- accept numbers only -->
-              <input class = "form-control" type = "number" name = "{{$name}}" id = "{{$name}}" value = {{$value}} 
-              min = "0" max = "4294967295" step = "1" required>
-            {{else if or (eq $name "TimeServerUrls") (eq $name "NameServers")}}
-            <!-- accept comma separated lists only -->
-              <input class = "form-control"type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} 
-              pattern = "^\[\s*[\w\d.]+(?:\s+[\w\d.]+)*\s*\]$" 
-              title = "Please enter a space seperated list, example: [4 2 0]"  required>
-            {{else}}
-            <!-- accept all strings -->
-              <input class = "form-control"type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} required>
-            {{end}}
-          </div>
-        {{end}}
+        {{ generateHTMLForm .YAMLData}}
         <div class = "row container">
           <button type = "submit" class = "mt-3 col-8 offset-2 btn btn-primary ">Save</button>
         </div>
