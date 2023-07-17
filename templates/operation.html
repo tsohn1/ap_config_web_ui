@@ -22,13 +22,12 @@
       </div>
     </div>
   </nav>  
-  <div>Full YAML: {{.YAMLData}}</div>
   <div class = "container row-gap-3 pt-5">
     <div class = "row container">
       <h1 class = "text-center">Operation YAML Configuration</h1>
     </div>
     
-    <form method="POST" action="/network.html" class = "row container overflow-auto justify-content-md-center" >
+    <form method="POST" action="/operation.html" class = "row container overflow-auto justify-content-md-center" >
       <div class = "row row-gap-3 gy-5">
         {{ generateHTMLForm .YAMLData}}
         <div class = "row container">

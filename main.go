@@ -35,7 +35,6 @@ var (
 )
 
 
-
 func readNetworkConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
 	parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
@@ -136,7 +135,82 @@ func readOperationConfig(ctx *gin.Context) {
 }
 
 func updateOperationConfig(ctx *gin.Context) {
-	return
+	err := ctx.Request.ParseForm()
+	if err != nil {
+		log.Println("Error: ctx.Request.ParseForm()", err)
+		// Handle the error, possibly by returning an error response
+		os.Exit(1)
+	}
+
+	//Retrieve all form fields
+	formFields := ctx.Request.PostForm
+	
+	//convert ScanProfile into [6]int
+	ScanProfileRaw := formFields.Get("ScanProfile")
+	ScanProfileRaw = strings.Trim(ScanProfileRaw, "[]")
+	ScanProfileArr := strings.Split(ScanProfileRaw, " ")
+	ScanProfileVal := make([]int, len(ScanProfileArr))
+
+	for i, val := range ScanProfileArr {
+		ScanProfileVal[i], err = strconv.Atoi(val)
+		if err != nil {
+			log.Println("updateNetworkConfigAtoi:", err)
+			os.Exit(1)
+		}
+	}
+	new_operation_struct := config.OperationEnv{}
+	op_struct_reflect := reflect.ValueOf(&new_operation_struct).Elem()
+
+	for i := 0; i < op_struct_reflect.NumField(); i++ {
+		field := op_struct_reflect.Type().Field(i)
+		value := op_struct_reflect.Field(i)
+		log.Printf("form result: %v", formFields.Get(field.Name))
+		switch field.Type.Kind() {
+		case reflect.String:
+			value.SetString(formFields.Get(field.Name))
+		case reflect.Int:
+			num, err := strconv.Atoi(formFields.Get(field.Name))
+			if err != nil {
+				log.Println("updateNetworkConfigAtoi: during loop", err)
+				os.Exit(1)
+			}
+			value.SetInt(int64(num))
+		case reflect.Bool:
+			if formFields.Get(field.Name) == "" {
+				value.SetBool(false)
+			} else {
+				value.SetBool(true)
+			}
+		}
+	}
+	newScanProfile := [6]int{}
+	copy(newScanProfile[:], ScanProfileVal)
+	new_operation_struct.ScanProfile = newScanProfile
+
+	if err != nil {
+		log.Println("Error: readOperationConfig, ", err)
+		os.Exit(1)
+	}
+
+	err = config.SetConfigEnv(OPERATION_ENV, &new_operation_struct)
+
+	if err != nil {
+		log.Println("Error:", err)
+		log.Println("updateOperationConfig  SetConfigEnv")
+		os.Exit(1)
+	}
+	if VALIDATE_YAML_CHANGES {
+		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN})
+		if err != nil {
+			log.Fatalf("Verify failed: %v", err)
+		}
+		if verResponse.IsValid {
+			log.Printf("Verify result: Valid")
+		} else {
+			log.Printf("Verify result: Invalid")
+		}
+	}
+	ctx.Redirect(http.StatusSeeOther, "/operation.html")
 }
 
 func generateHTMLForm(data interface{}) template.HTML {
@@ -160,7 +234,7 @@ func generateHTMLForm(data interface{}) template.HTML {
 		case reflect.Uint32:
 			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\">\n", fieldName, value.Uint())
 		case reflect.Int:
-			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\">\n", fieldName, value.Int())
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"-2147483648\" max=\"2147483647\" step=\"1\">\n", fieldName, value.Int())
 		case reflect.Bool:
 			formHTML += "<div class = \"row\">\n<div class = \"col d-flex align-items-center\">\n<div class = \"form-check form-switch\">\n"
 			if value.Bool(){
