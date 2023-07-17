@@ -22,47 +22,15 @@
       </div>
     </div>
   </nav>  
-  <div>Full YAML: {{.YAMLData.Data}}</div>
-  <div>Types: {{.YAMLData.Types}}</div>
-  <div>Indexing: {{$addddd := index .YAMLData.Types "ApBrokerRetryTimingSecond"}}{{$addddd}}</div>
-  <div>{{$wow := index .YAMLData.Types "AssignDataBackupFile"}}{{$addddd}}  {{$wow}}</div>
+  <div>Full YAML: {{.YAMLData}}</div>
   <div class = "container row-gap-3 pt-5">
     <div class = "row container">
       <h1 class = "text-center">Operation YAML Configuration</h1>
     </div>
     
-    
     <form method="POST" action="/network.html" class = "row container overflow-auto justify-content-md-center" >
       <div class = "row row-gap-3 gy-5">
-        {{range $name, $value := .YAMLData.Data}}
-          <div class = "col-6 container ">
-            <label class = "form-label" for = "{{$name}}">{{$name}}</label>
-            
-            {{if eq $name "LogCompress"}}
-              {{if $value}}
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked>
-                <label class="form-check-label" for="flexCheckDefault">
-                </label>
-              {{else}}
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                </label>
-              {{end}}
-            <!--
-              replace with number case
-              accept numbers only
-            -->
-            {{else if eq $name "scanProfile"}}
-            <!-- accept comma separated lists only -->
-              <input class = "form-control"type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} 
-              pattern = "^\[\d+(?:\s+\d+){5}\]$" 
-              title = "Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]"  required>
-            {{else}}
-            <!-- accept all strings -->
-              <input class = "form-control"type = "text" name = "{{$name}}" id = "{{$name}}" value = {{$value}} required>
-            {{end}}
-          </div>
-        {{end}}
+        {{ generateHTMLForm .YAMLData}}
         <div class = "row container">
           <button type = "submit" class = "mt-3 col-8 offset-2 btn btn-primary ">Save</button>
         </div>

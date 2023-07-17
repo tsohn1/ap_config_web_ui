@@ -9,6 +9,10 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"reflect"
+	"fmt"
+	"html/template"
+	"regexp"
 	"google.golang.org/grpc"
 	"context"
 	"google.golang.org/grpc/credentials/insecure"
@@ -169,21 +173,56 @@ func readOperationConfig(ctx *gin.Context) {
 
 	//type assertion to operationenv
 	operation_env_struct := parsed_operation_env.(*config.OperationEnv)
-
-	//change interface to map type to pass to html
-	operation_env_map := structs.Map(operation_env_struct)
 	
 	ctx.HTML(http.StatusOK, "operation.html", gin.H{
-		"YAMLData" : OperationData{
-				Data : operation_env_map,
-				Types: operationFieldTypes,
-		},
+		"YAMLData" : *operation_env_struct,
 	})
 }
 
 func updateOperationConfig(ctx *gin.Context) {
 	return
 }
+
+func generateHTMLForm(data interface{}) template.HTML {
+	v := reflect.ValueOf(data)
+	t := reflect.TypeOf(data)
+	
+	formHTML := ""
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+		fieldName := field.Name
+
+		if !value.CanInterface() {
+			continue
+		}
+		formHTML += fmt.Sprintf("<div class=\"col-6 container\">\n<label class= \"form-label\" for = \"%s\">%s</label>\n", fieldName, fieldName)
+		switch value.Kind() {
+		case reflect.String:
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"text\" name=\"%s\" value=\"%s\">\n", fieldName, value.String())
+		case reflect.Int:
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\">\n", fieldName, value.Int())
+		case reflect.Bool:
+			formHTML += "<div class = \"row\">\n<div class = \"col d-flex align-items-center\">\n<div class = \"form-check form-switch\">\n"
+			if value.Bool(){
+				formHTML += fmt.Sprintf("<input class=\"form-check-input\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\" checked>\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName)
+			} else{
+				formHTML += fmt.Sprintf("<input class=\"form-check-input\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\">\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName)
+			}
+			formHTML += "</div>\n</div>\n</div>\n"
+		case reflect.Array:
+			regex := regexp.MustCompile(`^\[\d+(?:\s+\d+){5}\]$`)
+			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" pattern = \"%s\" title = \"Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]\"  required>", 
+			fieldName, fieldName, value, regex)
+		}
+		formHTML += "</div>"
+	}
+	return template.HTML(formHTML)
+
+}
+
+
 func main() {
 
 	if VALIDATE_YAML_CHANGES {
@@ -196,6 +235,9 @@ func main() {
 	}
 	
 	router := gin.Default()
+	router.SetFuncMap(template.FuncMap{
+		"generateHTMLForm": generateHTMLForm,
+	})
 	router.LoadHTMLGlob("templates/*")
 	//initial load
 	router.GET("/", func(ctx *gin.Context) {
