@@ -22,7 +22,7 @@ const (
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
 	OPERATION_ENV = YAML_FOLDER + "operation.yaml"
-	VALIDATE_YAML_CHANGES = false //flag to validate YAML changes using gRPC
+	VALIDATE_YAML_CHANGES = true //flag to validate YAML changes using gRPC
 	GRPC_SUCCESS_TOKEN_NETWORK = 1
 	GRPC_SUCCESS_TOKEN_OPERATION = 2
 	GRPC_FAIL_TOKEN = 0
@@ -63,36 +63,36 @@ func updateNetworkConfig(ctx *gin.Context) {
 	//Retrieve all form fields
 	formFields := ctx.Request.PostForm
 
-	//convert SiteCode to uint32
-	SiteCode, err := strconv.Atoi(formFields.Get("SiteCode"))
-
-	if err != nil {
-		log.Println("Error:", err)
-		log.Println("updateNetworkConfigAtoi")
-		os.Exit(1)
-	}
-
 	//convert NameServers, TimeserverUrls into []string
 	nameServerRaw := formFields.Get("NameServers")
 	timeServerRaw := formFields.Get("TimeServerUrls")
 	nameServerRaw = strings.Trim(nameServerRaw, "[]")
 	timeServerRaw = strings.Trim(timeServerRaw, "[]")
 
-	new_network_struct := config.NetworkEnv{   
-		SiteId : formFields.Get("SiteId"),
-		SiteCode: uint32(SiteCode),
-		StoreCode: formFields.Get("StoreCode"),
-		Ip : formFields.Get("Ip"),                
-		DefaultGwIP : formFields.Get("DefaultGwIP"),       
-		Netmask : formFields.Get("Netmask"),           
-		NameServers : strings.Split(nameServerRaw, " "),       
-		TimeZone : formFields.Get("TimeZone"),          
+	new_network_struct := config.NetworkEnv{      
+		NameServers : strings.Split(nameServerRaw, " "),                
 		TimeServerUrls : strings.Split(timeServerRaw, " "),    
-		InterApPort : formFields.Get("InterApPort"),       
-		InterApPortTarget : formFields.Get("InterApPortTarget"), 
-		ApBrokerUrl : formFields.Get("ApBrokerUrl"),       
-		EthernetInterface : formFields.Get("EthernetInterface"),
 	}
+
+	net_struct_reflect := reflect.ValueOf(&new_network_struct).Elem()
+
+	//loop through struct fields and retreive values from form
+	for i := 0; i < net_struct_reflect.NumField(); i++ {
+		field := net_struct_reflect.Type().Field(i)
+		value := net_struct_reflect.Field(i)
+		switch field.Type.Kind() {
+		case reflect.String:
+			value.SetString(formFields.Get(field.Name))
+		case reflect.Uint32:
+			num, err := strconv.Atoi(formFields.Get(field.Name))
+			if err != nil {
+				log.Println("updateNetworkConfigAtoi: during loop", err)
+				os.Exit(1)
+			}
+			value.SetUint(uint64(num))
+		}
+	}
+
 	err = config.SetConfigEnv(NETWORK_ENV, &new_network_struct)
 
 	if err != nil {
@@ -152,7 +152,7 @@ func updateOperationConfig(ctx *gin.Context) {
 	ScanProfileArr := strings.Split(ScanProfileRaw, " ")
 	ScanProfileVal := make([]int, len(ScanProfileArr))
 
-	//loop through struct fields and retreive values from form
+	
 	for i, val := range ScanProfileArr {
 		ScanProfileVal[i], err = strconv.Atoi(val)
 		if err != nil {
@@ -163,6 +163,7 @@ func updateOperationConfig(ctx *gin.Context) {
 	new_operation_struct := config.OperationEnv{}
 	op_struct_reflect := reflect.ValueOf(&new_operation_struct).Elem()
 
+	//loop through struct fields and retreive values from form
 	for i := 0; i < op_struct_reflect.NumField(); i++ {
 		field := op_struct_reflect.Type().Field(i)
 		value := op_struct_reflect.Field(i)
