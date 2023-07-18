@@ -164,10 +164,12 @@ func updateOperationConfig(ctx *gin.Context) {
 
 	
 	for i, val := range ScanProfileArr {
-		ScanProfileVal[i], err = strconv.Atoi(val)
-		if err != nil {
-			log.Println("updateNetworkConfigAtoi:", err)
-			os.Exit(1)
+		if val != "" {
+			ScanProfileVal[i], err = strconv.Atoi(val)
+			if err != nil {
+				log.Println("updateNetworkConfigAtoi:", err)
+				os.Exit(1)
+			}
 		}
 	}
 	newOperationStruct := config.OperationEnv{}
