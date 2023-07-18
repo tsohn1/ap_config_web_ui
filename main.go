@@ -3,7 +3,6 @@ package main
 import (
 	"ap_config_web_ui/config"
 	"net/http"
-	"os"
 	"github.com/gin-gonic/gin"
 	"log"
 	"strconv"
@@ -51,8 +50,8 @@ func readNetworkConfig(ctx *gin.Context) {
 	parsedNetworkEnv, err := config.GetConfigEnv(NETWORK_ENV, &networkEnv)
 	if err != nil {
 		log.Println("readNetworkConfig Error:", err)
-		ctx.Set("errorMessage", "Failed to retrieve data.\nPlease try again later.")
-		ctx.Redirect(http.StatusFound, "/error.html")
+		errorMessage := "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
+		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 		return
 	}
 
@@ -68,8 +67,9 @@ func updateNetworkConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		// Handle the error, possibly by returning an error response
-		ctx.Set("errorMessage", "Failed to submit data.\nPlease try again later.")
-		ctx.Redirect(http.StatusFound, "/error.html")
+		log.Println("updateNetworkConfig Error:", err)
+		errorMessage := "Failed to submit data.\nPlease try again later."
+		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 		return
 	}
 
@@ -100,8 +100,8 @@ func updateNetworkConfig(ctx *gin.Context) {
 			num, err := strconv.Atoi(formFields.Get(field.Name))
 			if err != nil {
 				log.Println("updateNetworkConfigAtoi: during loop", err)
-				ctx.Set("errorMessage", "Failed to handle submitted data.\nPlease try again later.")
-				ctx.Redirect(http.StatusFound, "/error.html")
+				errorMessage := "Failed to handle submitted data.\nPlease try again later."
+				ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 				return
 			}
 			value.SetUint(uint64(num))
@@ -112,8 +112,8 @@ func updateNetworkConfig(ctx *gin.Context) {
 
 	if err != nil {
 		log.Println("updateNetworkConfig  SetConfigEnv Error:", err)
-		ctx.Set("errorMessage", "Failed to submit data.\nPlease try again later.")
-		ctx.Redirect(http.StatusFound, "/error.html")
+		errorMessage := "Failed to submit data.\nPlease try again later."
+		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 		return
 	}
 	if VALIDATE_YAML_CHANGES {
@@ -127,7 +127,7 @@ func updateNetworkConfig(ctx *gin.Context) {
 			log.Printf("updateNetworkConfig Verify result: Invalid")
 		}
 	}
-	ctx.Redirect(http.StatusSeeOther, "/network.html")
+	ctx.Redirect(http.StatusSeeOther, "/network")
 }
 
 func loadHomePage(ctx *gin.Context) {
@@ -139,8 +139,8 @@ func readOperationConfig(ctx *gin.Context) {
 	parsedOperationEnv, err := config.GetConfigEnv(OPERATION_ENV, &operationEnv)
 	if err != nil {
 		log.Println("readOperationConfig Error:", err)
-		ctx.Set("errorMessage", "Failed to retrieve data.\nPlease try again later.")
-		ctx.Redirect(http.StatusFound, "/error.html")
+		errorMessage := "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
+		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 		return
 	}
 
@@ -156,8 +156,8 @@ func updateOperationConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		log.Println("Error: ctx.Request.ParseForm()", err)
-		ctx.Set("errorMessage", "Failed to parse form.\nPlease try again later.")
-		ctx.Redirect(http.StatusFound, "/error.html")
+		errorMessage := "Failed to parse form.\nPlease try again later."
+		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 		return
 	}
 
@@ -175,8 +175,9 @@ func updateOperationConfig(ctx *gin.Context) {
 		if val != "" {
 			ScanProfileVal[i], err = strconv.Atoi(val)
 			if err != nil {
-				ctx.Set("errorMessage", "Failed to handle submitted data.\nPlease try again later.")
-				ctx.Redirect(http.StatusFound, "/error.html")
+				log.Printf("updateOperationConfig Atoi Err:%v", err)
+				errorMessage := "Failed to handle submitted data.\nPlease try again later."
+		 		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)	
 				return
 			}
 		}
@@ -194,8 +195,9 @@ func updateOperationConfig(ctx *gin.Context) {
 		case reflect.Int:
 			num, err := strconv.Atoi(formFields.Get(field.Name))
 			if err != nil {
-				ctx.Set("errorMessage", "Failed to handle submitted data.\nPlease try again later.")
-				ctx.Redirect(http.StatusFound, "/error.html")
+				log.Printf("updateOperationConfig Atoi Err:%v", err)
+				errorMessage := "Failed to handle submitted data.\nPlease try again later."
+				ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 				return
 			}
 			value.SetInt(int64(num))
@@ -215,8 +217,8 @@ func updateOperationConfig(ctx *gin.Context) {
 
 	if err != nil {
 		log.Println("updateOperationConfig SetConfig Env Error:", err)
-		ctx.Set("errorMessage", "Failed to submit data.\nPlease try again later.")
-		ctx.Redirect(http.StatusFound, "/error.html")
+		errorMessage := "Failed to submit data.\nPlease try again later."
+		ctx.Redirect(http.StatusFound, "/error?message="+errorMessage)
 		return
 	}
 	if VALIDATE_YAML_CHANGES {
@@ -230,7 +232,7 @@ func updateOperationConfig(ctx *gin.Context) {
 			log.Printf("updateOperationConfig Verify result: Invalid")
 		}
 	}
-	ctx.Redirect(http.StatusSeeOther, "/operation.html")
+	ctx.Redirect(http.StatusSeeOther, "/operation")
 }
 
 func generateHTMLForm(data interface{}) template.HTML {
@@ -279,7 +281,8 @@ func generateHTMLForm(data interface{}) template.HTML {
 }
 
 func handleErrors(ctx *gin.Context) {
-	errorMessage, _ := ctx.Get("errorMessage")
+	errorMessage := ctx.DefaultQuery("message", "An error occured.")
+	log.Println(errorMessage)
 	ctx.HTML(http.StatusOK, "error.html", gin.H{"errorMessage" : errorMessage,})
 }
 
@@ -301,27 +304,27 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	//initial load
 	router.GET("/", func(ctx *gin.Context) {
-		ctx.Redirect(http.StatusSeeOther, "/index.html")
+		ctx.Redirect(http.StatusSeeOther, "/index")
 	})
 
 	//homepage
-	router.GET("/index.html", loadHomePage)
+	router.GET("/index", loadHomePage)
 
 	// display network YAML data in webpage
-	router.GET("/network.html", readNetworkConfig)
+	router.GET("/network", readNetworkConfig)
 
 	// write to network YAML when form is submitted, update webpage as well
-	router.POST("/network.html", updateNetworkConfig)
+	router.POST("/network", updateNetworkConfig)
 
 	// diplay operation YAML data in webpage
-	router.GET("/operation.html", readOperationConfig)
+	router.GET("/operation", readOperationConfig)
 
 	// write to operation YAML when form is submitted, update webpage as well
-	router.POST("/operation.html", updateOperationConfig)
+	router.POST("/operation", updateOperationConfig)
 	
 	// error handling
-	router.GET("/error.html", handleErrors)
-	
+	router.GET("/error", handleErrors)
+
 	router.Run(":8080")
 
 }
