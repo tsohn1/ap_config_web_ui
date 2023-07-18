@@ -36,6 +36,16 @@ var (
 )
 
 
+func removeWhiteSpace(Arr []string) []string {
+	result := make([]string, 0)
+	for i, val := range Arr {
+		if val != "" {
+			result = append(result, Arr[i])
+		}
+	}
+	return result
+}
+
 func readNetworkConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
 	parsedNetworkEnv, err := config.GetConfigEnv(NETWORK_ENV, &networkEnv)
@@ -70,8 +80,8 @@ func updateNetworkConfig(ctx *gin.Context) {
 	timeServerRaw = strings.Trim(timeServerRaw, "[]")
 
 	newNetworkStruct := config.NetworkEnv{      
-		NameServers : strings.Split(nameServerRaw, " "),                
-		TimeServerUrls : strings.Split(timeServerRaw, " "),    
+		NameServers : removeWhiteSpace(strings.Split(nameServerRaw, " ")),                
+		TimeServerUrls : removeWhiteSpace(strings.Split(timeServerRaw, " ")),    
 	}
 
 	netStructReflect := reflect.ValueOf(&newNetworkStruct).Elem()
@@ -245,7 +255,7 @@ func generateHTMLForm(data interface{}) template.HTML {
 				formHTML += fmt.Sprintf("<input class=\"form-check-input\" name=\"%s\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\">\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName, fieldName)
 			}
 			formHTML += "</div>\n</div>\n</div>\n"
-		case reflect.Array:
+		case reflect.Array: //Special case for [6]int array
 			regex := regexp.MustCompile(`^\[\d+(?:\s+\d+){5}\]$`)
 			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" pattern = \"%s\" title = \"Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]\"  required>", 
 			fieldName, fieldName, value, regex)

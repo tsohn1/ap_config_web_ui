@@ -1,7 +1,6 @@
 package config
 
 type OperationEnv struct {
-	HomeDir           string `yaml:"homeDir"`
 	ConfigDir         string `yaml:"configDir"`
 	CertFile          string `yaml:"certFile"`
 	LogDir            string `yaml:"logDir"`
