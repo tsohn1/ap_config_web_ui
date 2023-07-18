@@ -22,7 +22,7 @@ const (
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
 	OPERATION_ENV = YAML_FOLDER + "operation.yaml"
-	VALIDATE_YAML_CHANGES = true //flag to validate YAML changes using gRPC
+	VALIDATE_YAML_CHANGES = false //flag to validate YAML changes using gRPC
 	GRPC_SUCCESS_TOKEN_NETWORK = 1
 	GRPC_SUCCESS_TOKEN_OPERATION = 2
 	GRPC_FAIL_TOKEN = 0
@@ -50,9 +50,10 @@ func readNetworkConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
 	parsedNetworkEnv, err := config.GetConfigEnv(NETWORK_ENV, &networkEnv)
 	if err != nil {
-		log.Println("Error:", err)
-		log.Println("readNetworkConfig")
-		os.Exit(1)
+		log.Println("readNetworkConfig Error:", err)
+		ctx.Set("errorMessage", "Failed to retrieve data.\nPlease try again later.")
+		ctx.Redirect(http.StatusFound, "/error.html")
+		return
 	}
 
 	//type assertion to networkenv
@@ -67,6 +68,8 @@ func updateNetworkConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		// Handle the error, possibly by returning an error response
+		ctx.Set("errorMessage", "Failed to submit data.\nPlease try again later.")
+		ctx.Redirect(http.StatusFound, "/error.html")
 		return
 	}
 
@@ -97,7 +100,9 @@ func updateNetworkConfig(ctx *gin.Context) {
 			num, err := strconv.Atoi(formFields.Get(field.Name))
 			if err != nil {
 				log.Println("updateNetworkConfigAtoi: during loop", err)
-				os.Exit(1)
+				ctx.Set("errorMessage", "Failed to handle submitted data.\nPlease try again later.")
+				ctx.Redirect(http.StatusFound, "/error.html")
+				return
 			}
 			value.SetUint(uint64(num))
 		}
@@ -106,14 +111,15 @@ func updateNetworkConfig(ctx *gin.Context) {
 	err = config.SetConfigEnv(NETWORK_ENV, &newNetworkStruct)
 
 	if err != nil {
-		log.Println("Error:", err)
-		log.Println("updateNetworkConfig  SetConfigEnv")
-		os.Exit(1)
+		log.Println("updateNetworkConfig  SetConfigEnv Error:", err)
+		ctx.Set("errorMessage", "Failed to submit data.\nPlease try again later.")
+		ctx.Redirect(http.StatusFound, "/error.html")
+		return
 	}
 	if VALIDATE_YAML_CHANGES {
 		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN_NETWORK})
 		if err != nil {
-			log.Fatalf("updateNetworkConfig Verify failed: %v", err)
+			log.Printf("updateNetworkConfig Verify failed: %v", err)
 		}
 		if verResponse.IsValid {
 			log.Printf("updateNetworkConfig Verify result: Valid")
@@ -132,9 +138,10 @@ func readOperationConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
 	parsedOperationEnv, err := config.GetConfigEnv(OPERATION_ENV, &operationEnv)
 	if err != nil {
-		log.Println("Error:", err)
-		log.Println("readOperationConfig")
-		os.Exit(1)
+		log.Println("readOperationConfig Error:", err)
+		ctx.Set("errorMessage", "Failed to retrieve data.\nPlease try again later.")
+		ctx.Redirect(http.StatusFound, "/error.html")
+		return
 	}
 
 	//type assertion to operationenv
@@ -149,8 +156,9 @@ func updateOperationConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		log.Println("Error: ctx.Request.ParseForm()", err)
-		// Handle the error, possibly by returning an error response
-		os.Exit(1)
+		ctx.Set("errorMessage", "Failed to parse form.\nPlease try again later.")
+		ctx.Redirect(http.StatusFound, "/error.html")
+		return
 	}
 
 	//Retrieve all form fields
@@ -167,8 +175,9 @@ func updateOperationConfig(ctx *gin.Context) {
 		if val != "" {
 			ScanProfileVal[i], err = strconv.Atoi(val)
 			if err != nil {
-				log.Println("updateNetworkConfigAtoi:", err)
-				os.Exit(1)
+				ctx.Set("errorMessage", "Failed to handle submitted data.\nPlease try again later.")
+				ctx.Redirect(http.StatusFound, "/error.html")
+				return
 			}
 		}
 	}
@@ -185,8 +194,9 @@ func updateOperationConfig(ctx *gin.Context) {
 		case reflect.Int:
 			num, err := strconv.Atoi(formFields.Get(field.Name))
 			if err != nil {
-				log.Println("updateNetworkConfigAtoi: during loop", err)
-				os.Exit(1)
+				ctx.Set("errorMessage", "Failed to handle submitted data.\nPlease try again later.")
+				ctx.Redirect(http.StatusFound, "/error.html")
+				return
 			}
 			value.SetInt(int64(num))
 		case reflect.Bool:
@@ -201,17 +211,13 @@ func updateOperationConfig(ctx *gin.Context) {
 	copy(newScanProfile[:], ScanProfileVal)
 	newOperationStruct.ScanProfile = newScanProfile
 
-	if err != nil {
-		log.Println("Error: readOperationConfig, ", err)
-		os.Exit(1)
-	}
-
 	err = config.SetConfigEnv(OPERATION_ENV, &newOperationStruct)
 
 	if err != nil {
-		log.Println("Error:", err)
-		log.Println("updateOperationConfig  SetConfigEnv")
-		os.Exit(1)
+		log.Println("updateOperationConfig SetConfig Env Error:", err)
+		ctx.Set("errorMessage", "Failed to submit data.\nPlease try again later.")
+		ctx.Redirect(http.StatusFound, "/error.html")
+		return
 	}
 	if VALIDATE_YAML_CHANGES {
 		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN_OPERATION})
@@ -272,6 +278,10 @@ func generateHTMLForm(data interface{}) template.HTML {
 
 }
 
+func handleErrors(ctx *gin.Context) {
+	errorMessage, _ := ctx.Get("errorMessage")
+	ctx.HTML(http.StatusOK, "error.html", gin.H{"errorMessage" : errorMessage,})
+}
 
 func main() {
 
@@ -308,6 +318,9 @@ func main() {
 
 	// write to operation YAML when form is submitted, update webpage as well
 	router.POST("/operation.html", updateOperationConfig)
+	
+	// error handling
+	router.GET("/error.html", handleErrors)
 	
 	router.Run(":8080")
 
