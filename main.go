@@ -23,7 +23,8 @@ const (
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
 	OPERATION_ENV = YAML_FOLDER + "operation.yaml"
 	VALIDATE_YAML_CHANGES = false //flag to validate YAML changes using gRPC
-	GRPC_SUCCESS_TOKEN = 1
+	GRPC_SUCCESS_TOKEN_NETWORK = 1
+	GRPC_SUCCESS_TOKEN_OPERATION = 2
 	GRPC_FAIL_TOKEN = 0
 )
 
@@ -100,14 +101,14 @@ func updateNetworkConfig(ctx *gin.Context) {
 		os.Exit(1)
 	}
 	if VALIDATE_YAML_CHANGES {
-		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN})
+		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN_NETWORK})
 		if err != nil {
-			log.Fatalf("Verify failed: %v", err)
+			log.Fatalf("updateNetworkConfig Verify failed: %v", err)
 		}
 		if verResponse.IsValid {
-			log.Printf("Verify result: Valid")
+			log.Printf("updateNetworkConfig Verify result: Valid")
 		} else {
-			log.Printf("Verify result: Invalid")
+			log.Printf("updateNetworkConfig Verify result: Invalid")
 		}
 	}
 	ctx.Redirect(http.StatusSeeOther, "/network.html")
@@ -151,6 +152,7 @@ func updateOperationConfig(ctx *gin.Context) {
 	ScanProfileArr := strings.Split(ScanProfileRaw, " ")
 	ScanProfileVal := make([]int, len(ScanProfileArr))
 
+	//loop through struct fields and retreive values from form
 	for i, val := range ScanProfileArr {
 		ScanProfileVal[i], err = strconv.Atoi(val)
 		if err != nil {
@@ -199,14 +201,14 @@ func updateOperationConfig(ctx *gin.Context) {
 		os.Exit(1)
 	}
 	if VALIDATE_YAML_CHANGES {
-		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN})
+		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN_OPERATION})
 		if err != nil {
-			log.Fatalf("Verify failed: %v", err)
+			log.Fatalf("updateOperationConfig Verify failed: %v", err)
 		}
 		if verResponse.IsValid {
-			log.Printf("Verify result: Valid")
+			log.Printf("updateOperationConfig Verify result: Valid")
 		} else {
-			log.Printf("Verify result: Invalid")
+			log.Printf("updateOperationConfig Verify result: Invalid")
 		}
 	}
 	ctx.Redirect(http.StatusSeeOther, "/operation.html")
