@@ -29,8 +29,8 @@ const (
 )
 
 var (
-	network_env config.NetworkEnv
-	operation_env config.OperationEnv
+	networkEnv config.NetworkEnv
+	operationEnv config.OperationEnv
 	client validate.ValidateClient
 
 )
@@ -38,7 +38,7 @@ var (
 
 func readNetworkConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
-	parsed_network_env, err := config.GetConfigEnv(NETWORK_ENV, &network_env)
+	parsedNetworkEnv, err := config.GetConfigEnv(NETWORK_ENV, &networkEnv)
 	if err != nil {
 		log.Println("Error:", err)
 		log.Println("readNetworkConfig")
@@ -46,10 +46,10 @@ func readNetworkConfig(ctx *gin.Context) {
 	}
 
 	//type assertion to networkenv
-	network_env_struct := parsed_network_env.(*config.NetworkEnv)
+	networkEnvStruct := parsedNetworkEnv.(*config.NetworkEnv)
 
 	ctx.HTML(http.StatusOK, "network.html", gin.H{
-		"YAMLData" : *network_env_struct,
+		"YAMLData" : *networkEnvStruct,
 	})
 }
 
@@ -69,17 +69,17 @@ func updateNetworkConfig(ctx *gin.Context) {
 	nameServerRaw = strings.Trim(nameServerRaw, "[]")
 	timeServerRaw = strings.Trim(timeServerRaw, "[]")
 
-	new_network_struct := config.NetworkEnv{      
+	newNetworkStruct := config.NetworkEnv{      
 		NameServers : strings.Split(nameServerRaw, " "),                
 		TimeServerUrls : strings.Split(timeServerRaw, " "),    
 	}
 
-	net_struct_reflect := reflect.ValueOf(&new_network_struct).Elem()
+	netStructReflect := reflect.ValueOf(&newNetworkStruct).Elem()
 
 	//loop through struct fields and retreive values from form
-	for i := 0; i < net_struct_reflect.NumField(); i++ {
-		field := net_struct_reflect.Type().Field(i)
-		value := net_struct_reflect.Field(i)
+	for i := 0; i < netStructReflect.NumField(); i++ {
+		field := netStructReflect.Type().Field(i)
+		value := netStructReflect.Field(i)
 		switch field.Type.Kind() {
 		case reflect.String:
 			value.SetString(formFields.Get(field.Name))
@@ -93,7 +93,7 @@ func updateNetworkConfig(ctx *gin.Context) {
 		}
 	}
 
-	err = config.SetConfigEnv(NETWORK_ENV, &new_network_struct)
+	err = config.SetConfigEnv(NETWORK_ENV, &newNetworkStruct)
 
 	if err != nil {
 		log.Println("Error:", err)
@@ -120,7 +120,7 @@ func loadHomePage(ctx *gin.Context) {
 
 func readOperationConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
-	parsed_operation_env, err := config.GetConfigEnv(OPERATION_ENV, &operation_env)
+	parsedOperationEnv, err := config.GetConfigEnv(OPERATION_ENV, &operationEnv)
 	if err != nil {
 		log.Println("Error:", err)
 		log.Println("readOperationConfig")
@@ -128,10 +128,10 @@ func readOperationConfig(ctx *gin.Context) {
 	}
 
 	//type assertion to operationenv
-	operation_env_struct := parsed_operation_env.(*config.OperationEnv)
+	operationEnvStruct := parsedOperationEnv.(*config.OperationEnv)
 	
 	ctx.HTML(http.StatusOK, "operation.html", gin.H{
-		"YAMLData" : *operation_env_struct,
+		"YAMLData" : *operationEnvStruct,
 	})
 }
 
@@ -160,13 +160,13 @@ func updateOperationConfig(ctx *gin.Context) {
 			os.Exit(1)
 		}
 	}
-	new_operation_struct := config.OperationEnv{}
-	op_struct_reflect := reflect.ValueOf(&new_operation_struct).Elem()
+	newOperationStruct := config.OperationEnv{}
+	opStructReflect := reflect.ValueOf(&newOperationStruct).Elem()
 
 	//loop through struct fields and retreive values from form
-	for i := 0; i < op_struct_reflect.NumField(); i++ {
-		field := op_struct_reflect.Type().Field(i)
-		value := op_struct_reflect.Field(i)
+	for i := 0; i < opStructReflect.NumField(); i++ {
+		field := opStructReflect.Type().Field(i)
+		value := opStructReflect.Field(i)
 		switch field.Type.Kind() {
 		case reflect.String:
 			value.SetString(formFields.Get(field.Name))
@@ -187,14 +187,14 @@ func updateOperationConfig(ctx *gin.Context) {
 	}
 	newScanProfile := [6]int{}
 	copy(newScanProfile[:], ScanProfileVal)
-	new_operation_struct.ScanProfile = newScanProfile
+	newOperationStruct.ScanProfile = newScanProfile
 
 	if err != nil {
 		log.Println("Error: readOperationConfig, ", err)
 		os.Exit(1)
 	}
 
-	err = config.SetConfigEnv(OPERATION_ENV, &new_operation_struct)
+	err = config.SetConfigEnv(OPERATION_ENV, &newOperationStruct)
 
 	if err != nil {
 		log.Println("Error:", err)
