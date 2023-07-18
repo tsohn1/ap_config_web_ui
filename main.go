@@ -282,6 +282,10 @@ func handleErrors(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "error.html", gin.H{"errorMessage" : errorMessage,})
 }
 
+func handle404(ctx *gin.Context) {
+	ctx.HTML(http.StatusNotFound, "404.html", nil)
+}
+
 func main() {
 
 	if VALIDATE_YAML_CHANGES {
@@ -317,6 +321,8 @@ func main() {
 	
 	// error handling
 	router.GET("/error", handleErrors)
+
+	router.NoRoute(handle404)
 
 	router.Run(":8080")
 
