@@ -130,10 +130,6 @@ func updateNetworkConfig(ctx *gin.Context) {
 	ctx.Redirect(http.StatusSeeOther, "/network")
 }
 
-func loadHomePage(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "index.html", nil)
-}
-
 func readOperationConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
 	parsedOperationEnv, err := config.GetConfigEnv(OPERATION_ENV, &operationEnv)
@@ -304,11 +300,8 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	//initial load
 	router.GET("/", func(ctx *gin.Context) {
-		ctx.Redirect(http.StatusSeeOther, "/index")
+		ctx.Redirect(http.StatusSeeOther, "/network")
 	})
-
-	//homepage
-	router.GET("/index", loadHomePage)
 
 	// display network YAML data in webpage
 	router.GET("/network", readNetworkConfig)
