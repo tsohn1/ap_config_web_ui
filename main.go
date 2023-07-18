@@ -164,7 +164,6 @@ func updateOperationConfig(ctx *gin.Context) {
 	for i := 0; i < op_struct_reflect.NumField(); i++ {
 		field := op_struct_reflect.Type().Field(i)
 		value := op_struct_reflect.Field(i)
-		log.Printf("form result: %v", formFields.Get(field.Name))
 		switch field.Type.Kind() {
 		case reflect.String:
 			value.SetString(formFields.Get(field.Name))
@@ -238,9 +237,9 @@ func generateHTMLForm(data interface{}) template.HTML {
 		case reflect.Bool:
 			formHTML += "<div class = \"row\">\n<div class = \"col d-flex align-items-center\">\n<div class = \"form-check form-switch\">\n"
 			if value.Bool(){
-				formHTML += fmt.Sprintf("<input class=\"form-check-input\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\" checked>\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName)
+				formHTML += fmt.Sprintf("<input class=\"form-check-input\" name=\"%s\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\" checked>\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName, fieldName)
 			} else{
-				formHTML += fmt.Sprintf("<input class=\"form-check-input\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\">\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName)
+				formHTML += fmt.Sprintf("<input class=\"form-check-input\" name=\"%s\" type=\"checkbox\" role=\"switch\" id=\"flexSwitchCheckDefault\">\n<label class=\"form-check-label\" for=\"%s\">On: True, Off: False\n</label>", fieldName, fieldName)
 			}
 			formHTML += "</div>\n</div>\n</div>\n"
 		case reflect.Array:
