@@ -34,6 +34,9 @@ var (
 
 )
 
+func addQuotationLiteral(s string) string {
+	return strings.ReplaceAll(s, "\"", "&quot;")
+}
 
 func removeWhiteSpace(Arr []string) []string {
 	result := make([]string, 0)
@@ -248,11 +251,12 @@ func generateHTMLForm(data interface{}) template.HTML {
 		formHTML += fmt.Sprintf("<div class=\"col-6 container\">\n<label class= \"form-label\" for = \"%s\">%s</label>\n", fieldName, fieldName)
 		switch value.Kind() {
 		case reflect.String:
-			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"text\" name=\"%s\" value=\"%s\">\n", fieldName, value.String())
+			v := addQuotationLiteral(value.String())
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"text\" name=\"%s\" value=\"%s\"required>\n", fieldName, v)
 		case reflect.Uint32:
-			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\">\n", fieldName, value.Uint())
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\" required>\n", fieldName, value.Uint())
 		case reflect.Int:
-			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"-2147483648\" max=\"2147483647\" step=\"1\">\n", fieldName, value.Int())
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"-2147483648\" max=\"2147483647\" step=\"1\" required>\n", fieldName, value.Int())
 		case reflect.Bool:
 			formHTML += "<div class = \"row\">\n<div class = \"col d-flex align-items-center\">\n<div class = \"form-check form-switch\">\n"
 			if value.Bool(){
@@ -317,7 +321,7 @@ func main() {
 		}()
 		ctx.Next()
 	})
-	
+
 	//initial load
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusSeeOther, "/network")
