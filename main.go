@@ -287,7 +287,7 @@ func handle404(ctx *gin.Context) {
 }
 
 func main() {
-
+	gin.SetMode(gin.ReleaseMode)
 	if VALIDATE_YAML_CHANGES {
 		conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
@@ -302,6 +302,22 @@ func main() {
 		"generateHTMLForm": generateHTMLForm,
 	})
 	router.LoadHTMLGlob("templates/*")
+
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+
+	//custom middleware to handle error 500
+	router.Use(func (ctx *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				ctx.Header("Content-Type", "text/html; charset=utf-8")
+				ctx.HTML(http.StatusInternalServerError, "500.html", nil)
+				ctx.Abort()
+			}
+		}()
+		ctx.Next()
+	})
+	
 	//initial load
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusSeeOther, "/network")
@@ -322,8 +338,9 @@ func main() {
 	// error handling
 	router.GET("/error", handleErrors)
 
+	// handle error 404
 	router.NoRoute(handle404)
-
+	
 	router.Run(":8080")
 
 }
