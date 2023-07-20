@@ -18,6 +18,7 @@ import (
 )
 
 const (
+	MAX_INPUT_LENGTH = 2 << 14
 	YAML_FOLDER = "config_files/"
 	NETWORK_ENV = YAML_FOLDER + "network.yaml"
 	OPERATION_ENV = YAML_FOLDER + "operation.yaml"
@@ -252,7 +253,7 @@ func generateHTMLForm(data interface{}) template.HTML {
 		switch value.Kind() {
 		case reflect.String:
 			v := addQuotationLiteral(value.String())
-			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"text\" name=\"%s\" value=\"%s\"required>\n", fieldName, v)
+			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"text\" name=\"%s\" value=\"%s\" maxlength=\"%v\" required>\n", fieldName, v, MAX_INPUT_LENGTH)
 		case reflect.Uint32:
 			formHTML += fmt.Sprintf("<input class = \"form-control\" type=\"number\" name=\"%s\" value=\"%d\" min=\"0\" max=\"4294967295\" step=\"1\" required>\n", fieldName, value.Uint())
 		case reflect.Int:
@@ -267,12 +268,12 @@ func generateHTMLForm(data interface{}) template.HTML {
 			formHTML += "</div>\n</div>\n</div>\n"
 		case reflect.Array: //Special case for [6]int array
 			regex := regexp.MustCompile(`^\[\d+(?:\s+\d+){5}\]$`)
-			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" pattern = \"%s\" title = \"Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]\"  required>", 
-			fieldName, fieldName, value, regex)
+			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" maxlength=\"%v\" pattern = \"%s\" title = \"Please enter a space seperated int list of length 6, example: [4 3 2 6 0 1]\"  required>", 
+			fieldName, fieldName, value, MAX_INPUT_LENGTH, regex)
 		case reflect.Slice:
 			regex := regexp.MustCompile(`^\[\s*[\w\d.]+(?:\s+[\w\d.]+)*\s*\]$`)
-			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" pattern = \"%s\" title = \"Please enter a space seperated list, example: [4 2 0]\"  required>", 
-			fieldName, fieldName, value, regex)
+			formHTML += fmt.Sprintf("<input class = \"form-control\"type = \"text\" name = \"%s\" id = \"%s\" value = \"%v\" maxlength=\"%v\" pattern = \"%s\" title = \"Please enter a space seperated list, example: [4 2 0]\"  required>", 
+			fieldName, fieldName, value, MAX_INPUT_LENGTH, regex)
 		}
 		formHTML += "</div>"
 	}
