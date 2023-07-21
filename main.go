@@ -308,8 +308,6 @@ func main() {
 	})
 	router.LoadHTMLGlob("templates/*")
 
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
 
 	//custom middleware to handle error 500
 	router.Use(func (ctx *gin.Context) {
