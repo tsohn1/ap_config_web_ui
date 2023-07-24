@@ -17,12 +17,16 @@ import (
 	validate "ap_config_web_ui/validate"
 )
 
+type Language string
+
 const (
 	MAX_INPUT_LENGTH = 2 << 14
 	VALIDATE_YAML_CHANGES = false //flag to validate YAML changes using gRPC
 	GRPC_SUCCESS_TOKEN_NETWORK = 1
 	GRPC_SUCCESS_TOKEN_OPERATION = 2
 	GRPC_FAIL_TOKEN = 0
+	English Language = "en"
+	Korean Language = "kr"
 )
 
 var (
@@ -32,6 +36,118 @@ var (
 	errorMessage string
 
 )
+
+var (
+	enNames = map[string]string{
+	"ConfigDir" : "Configuration Directory",                        
+	"CertFile" : "Certification File",                        
+	"LogDir" : "Log Directory",                        
+	"TmpDir" : "Tmp Directory",                        
+	"TagImageDir" : "Tag Image Directory",                        
+	"TemplateDir" : "Template Directory",                        
+	"FontDir" : "Font Directory",                        
+	"ImageDir" : "Image Directory",                        
+	"ExternalBinaryDir" : "External Binary Directory",                                      
+	"DataBackupDir" : "Data Backup Directory",
+
+	"LogLevel" : "Log Level",                        
+	"ApBrokerRetryTimingSecond" : "Ap Broker Retry Timing (seconds)",                        
+	"ImgGenThreadCount" : "Image Generation Thread Count",                     
+	"ImgGenReqPort" : "Image Generation Request Port",                        
+	"ImgGenRespPort" : "Image Generation Response Port",                        
+	"ImgGenPubPort" : "Image Generation Public Port",                        
+	"EslApTimerReqPort" : "Esl Ap Timer Request Port",                        
+	"DeassignThreadCount" : "Deassign Thread Count",                      
+	"FontFacePreloadCount" : "Font Face Preload Count",                 
+
+	"LastTaskIdBackupFile" : "Last Task Id Backup File",                        
+	"ProductDataBackupFile" : "Product Data Backup File",                           
+	"NfcDataBackupFile" : "Nfc Data Backup File",                        
+	"EventFrameTxTiming" : "Event Frame Tx Timing",                     
+	"TagImageTxTimging" : "Tag Image TxT imging",                       
+	"ScanProfile" : "Scan Profile",                        
+	"BackoffBase" : "Backoff Base",                        
+	"BackoffMulFactor" : "Backoff Mul Factor",                        
+	"FreezerTagMultiplier" : "Freezer Tag Multiplier",                        
+	"TagDistributionMinute" : "Tag Distribution Minute",                        
+	"PageRotationMacPage" : "Page Rotation Mac Page",                        
+
+	"LogMaxSizeMb" : "Log Max Size (Mb)",                       
+	"LogMaxBackup" : "Log Max Backup",                       
+	"LogMaxAgeDays" : "Log Max Age (Days)",                        
+	"LogCompress" : "Log Compress",                        
+	"GRpcMaxSize" : "GRpc Max Size", 
+	
+	"SiteId" : "Site ID",
+	"SiteCode" : "Site Code",
+	"StoreCode" : "Store Code",
+	"Ip" : "IP",
+	"DefaultGwIP" : "Default Gw IP",
+	"Netmask" : "Net mask",
+	"NameServers" : "Name Servers",
+	"TimeZone" : "Time Zone",
+	"TimeServerUrls" : "Time Server URLs",
+	"InterApPort" : "Inter AP Port",
+	"InterApPortTarget" : "Inter AP Port Target",
+	"ApBrokerUrl" : "AP Broker URL",
+	"EthernetInterface" : "Ethernet Interface",
+	}
+	krNames = map[string]string{
+		"ConfigDir" : "ConfigDir",                        
+		"CertFile" : "CertFile",                        
+		"LogDir" : "LogDir",                        
+		"TmpDir" : "TmpDir",                        
+		"TagImageDir" : "TagImageDir",                        
+		"TemplateDir" : "TemplateDir",                        
+		"FontDir" : "FontDir",                        
+		"ImageDir" : "ImageDir",                        
+		"ExternalBinaryDir" : "ExternalBinaryDir",                                      
+		"DataBackupDir" : "DataBackupDir",
+
+		"LogLevel" : "LogLevel",                        
+		"ApBrokerRetryTimingSecond" : "ApBrokerRetryTimingSecond",                        
+		"ImgGenThreadCount" : "ImgGenThreadCount",                     
+		"ImgGenReqPort" : "ImgGenReqPort",                        
+		"ImgGenRespPort" : "ImgGenRespPort",                        
+		"ImgGenPubPort" : "ImgGenPubPort",                        
+		"EslApTimerReqPort" : "EslApTimerReqPort",                        
+		"DeassignThreadCount" : "DeassignThreadCount",                      
+		"FontFacePreloadCount" : "FontFacePreloadCount",                 
+	
+		"LastTaskIdBackupFile" : "LastTaskIdBackupFile",                        
+		"ProductDataBackupFile" : "ProductDataBackupFile",                           
+		"NfcDataBackupFile" : "NfcDataBackupFile",                        
+		"EventFrameTxTiming" : "EventFrameTxTiming",                     
+		"TagImageTxTimging" : "TagImageTxTimging",                       
+		"ScanProfile" : "ScanProfile",                        
+		"BackoffBase" : "BackoffBase",                        
+		"BackoffMulFactor" : "BackoffMulFactor",                        
+		"FreezerTagMultiplier" : "FreezerTagMultiplier",                        
+		"TagDistributionMinute" : "TagDistributionMinute",                        
+		"PageRotationMacPage" : "PageRotationMacPage",                        
+	
+		"LogMaxSizeMb" : "LogMaxSizeMb",                       
+		"LogMaxBackup" : "LogMaxBackup",                       
+		"LogMaxAgeDays" : "LogMaxAgeDays",                        
+		"LogCompress" : "LogCompress",                        
+		"GRpcMaxSize" : "GRpcMaxSize", 
+		
+		"SiteId" : "SiteId",
+		"SiteCode" : "SiteCode",
+		"StoreCode" : "StoreCode",
+		"Ip" : "Ip",
+		"DefaultGwIP" : "DefaultGwIP",
+		"Netmask" : "Netmask",
+		"NameServers" : "NameServers",
+		"TimeZone" : "TimeZone",
+		"TimeServerUrls" : "TimeServerUrls",
+		"InterApPort" : "InterApPort",
+		"InterApPortTarget" : "InterApPortTarget",
+		"ApBrokerUrl" : "ApBrokerUrl",
+		"EthernetInterface" : "EthernetInterface",
+		}
+)
+
 
 func addQuotationLiteral(s string) string {
 	return strings.ReplaceAll(s, "\"", "&quot;")
@@ -247,7 +363,7 @@ func generateHTMLForm(data interface{}) template.HTML {
 		if !value.CanInterface() {
 			continue
 		}
-		formHTML += fmt.Sprintf("<div class=\"col-6 container\">\n<label class= \"form-label\" for = \"%s\">%s</label>\n", fieldName, fieldName)
+		formHTML += fmt.Sprintf("<div class=\"col-6 container\">\n<label class= \"form-label\" for = \"%s\">%s</label>\n", fieldName, enNames[fieldName])
 		switch value.Kind() {
 		case reflect.String:
 			v := addQuotationLiteral(value.String())
@@ -304,7 +420,7 @@ func main() {
 		"generateHTMLForm": generateHTMLForm,
 	})
 	router.LoadHTMLGlob("templates/*")
-
+	router.Static("/scripts", "./scripts")
 
 	//custom middleware to handle error 500
 	router.Use(func (ctx *gin.Context) {

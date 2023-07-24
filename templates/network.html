@@ -8,18 +8,32 @@
 </head>
 <body>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-  <nav class="navbar" style="background-color: #e3f2fd;">
+  <script src="../scripts/language.js"></script>
+  <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
     <div class="container-fluid">
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="network">Network</a>
-          <a class="nav-link" href="operation">Operation</a>
-        </div>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li><a class="nav-link" href="network">Network</a></li>
+          <li><a class="nav-link" href="operation">Operation</a></li>
+        </ul>
+          
+        <ul class = "navbar-nav ml-auto">
+          <li class = "nav-item dropdown">
+            <a class = "nav-link dropdown-toggle" href="#" id="languageDropdown" data-bs-toggle="dropdown" role = "button"  aria-haspopup = "true" aria-expanded = "false">
+              Language
+            </a>
+            <ul class = "dropdown-menu" aria-labelledby="languageDropdown">
+              <li><a class = "dropdown-item" data-language = "en" href="#">English</a></li>
+              <li><a class = "dropdown-item" data-language = "kr" href="#">Korean</a></li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
+
   </nav>  
   <div class = "container py-5">
     <div class = "row container">
