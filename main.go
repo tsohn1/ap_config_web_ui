@@ -19,9 +19,6 @@ import (
 
 const (
 	MAX_INPUT_LENGTH = 2 << 14
-	YAML_FOLDER = "config_files/"
-	NETWORK_ENV = YAML_FOLDER + "network.yaml"
-	OPERATION_ENV = YAML_FOLDER + "operation.yaml"
 	VALIDATE_YAML_CHANGES = false //flag to validate YAML changes using gRPC
 	GRPC_SUCCESS_TOKEN_NETWORK = 1
 	GRPC_SUCCESS_TOKEN_OPERATION = 2
@@ -52,7 +49,7 @@ func removeWhiteSpace(Arr []string) []string {
 
 func readNetworkConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
-	parsedNetworkEnv, err := config.GetConfigEnv(NETWORK_ENV, &networkEnv)
+	parsedNetworkEnv, err := config.GetConfigEnv(config.NETWORK_ENV, &networkEnv)
 	if err != nil {
 		log.Println("readNetworkConfig Error:", err)
 		errorMessage = "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
@@ -113,7 +110,7 @@ func updateNetworkConfig(ctx *gin.Context) {
 		}
 	}
 
-	err = config.SetConfigEnv(NETWORK_ENV, &newNetworkStruct)
+	err = config.SetConfigEnv(config.NETWORK_ENV, &newNetworkStruct)
 
 	if err != nil {
 		log.Println("updateNetworkConfig  SetConfigEnv Error:", err)
@@ -137,7 +134,7 @@ func updateNetworkConfig(ctx *gin.Context) {
 
 func readOperationConfig(ctx *gin.Context) {
 	//parse YAML from yaml directory
-	parsedOperationEnv, err := config.GetConfigEnv(OPERATION_ENV, &operationEnv)
+	parsedOperationEnv, err := config.GetConfigEnv(config.OPERATION_ENV, &operationEnv)
 	if err != nil {
 		log.Println("readOperationConfig Error:", err)
 		errorMessage = "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
@@ -214,7 +211,7 @@ func updateOperationConfig(ctx *gin.Context) {
 	copy(newScanProfile[:], ScanProfileVal)
 	newOperationStruct.ScanProfile = newScanProfile
 
-	err = config.SetConfigEnv(OPERATION_ENV, &newOperationStruct)
+	err = config.SetConfigEnv(config.OPERATION_ENV, &newOperationStruct)
 
 	if err != nil {
 		log.Println("updateOperationConfig SetConfig Env Error:", err)
