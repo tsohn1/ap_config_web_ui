@@ -225,7 +225,7 @@ func updateOperationConfig(ctx *gin.Context) {
 	if VALIDATE_YAML_CHANGES {
 		verResponse, err := client.Verify(context.Background(), &validate.VerifyRequest{Token: GRPC_SUCCESS_TOKEN_OPERATION})
 		if err != nil {
-			log.Fatalf("updateOperationConfig Verify failed: %v", err)
+			log.Printf("updateOperationConfig Verify failed: %v", err)
 		}
 		if verResponse.IsValid {
 			log.Printf("updateOperationConfig Verify result: Valid")
@@ -296,7 +296,7 @@ func main() {
 	if VALIDATE_YAML_CHANGES {
 		conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			log.Fatalf("Failed to connect: %v", err)
+			log.Printf("Failed to connect: %v", err)
 		}
 		defer conn.Close()
 		client = validate.NewValidateClient(conn)
