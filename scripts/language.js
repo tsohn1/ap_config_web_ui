@@ -4,9 +4,12 @@ document.addEventListener("DOMContentLoaded", function () {
   dropdownItems.forEach(item => {
     item.addEventListener("click", function (event) {
       event.preventDefault();
-      // let selectedLanguage = this.getAttribute("data-language");
+      selectedLanguage = this.getAttribute("data-language");
       dropdownItems.forEach(item => item.classList.remove("active"));
       this.classList.add("active");
+      Cookies.set("language", selectedLanguage, { expires: 30});
+      console.log(selectedLanguage)
+      window.location.reload();
     });
   });
 });

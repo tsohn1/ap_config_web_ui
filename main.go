@@ -34,7 +34,7 @@ var (
 	operationEnv config.OperationEnv
 	client validate.ValidateClient
 	errorMessage string
-
+	currentLang string
 )
 
 var (
@@ -61,10 +61,11 @@ var (
 	"FontFacePreloadCount" : "Font Face Preload Count",                 
 
 	"LastTaskIdBackupFile" : "Last Task Id Backup File",                        
-	"ProductDataBackupFile" : "Product Data Backup File",                           
+	"ProductDataBackupFile" : "Product Data Backup File", 
+	"AssignDataBackupFile" : "Assign Data Backup File",                          
 	"NfcDataBackupFile" : "Nfc Data Backup File",                        
 	"EventFrameTxTiming" : "Event Frame Tx Timing",                     
-	"TagImageTxTimging" : "Tag Image TxT imging",                       
+	"TagImageTxTimging" : "Tag Image TxT Timing",                       
 	"ScanProfile" : "Scan Profile",                        
 	"BackoffBase" : "Backoff Base",                        
 	"BackoffMulFactor" : "Backoff Mul Factor",                        
@@ -93,58 +94,59 @@ var (
 	"EthernetInterface" : "Ethernet Interface",
 	}
 	krNames = map[string]string{
-		"ConfigDir" : "ConfigDir",                        
-		"CertFile" : "CertFile",                        
-		"LogDir" : "LogDir",                        
-		"TmpDir" : "TmpDir",                        
-		"TagImageDir" : "TagImageDir",                        
-		"TemplateDir" : "TemplateDir",                        
-		"FontDir" : "FontDir",                        
-		"ImageDir" : "ImageDir",                        
-		"ExternalBinaryDir" : "ExternalBinaryDir",                                      
-		"DataBackupDir" : "DataBackupDir",
+		"ConfigDir" : "컨피그 디렉터리",                        
+		"CertFile" : "인증 파일",                        
+		"LogDir" : "로그 디렉터리",                        
+		"TmpDir" : "Tmp 디렉터리",                        
+		"TagImageDir" : "태그 이미지 디렉터리",                        
+		"TemplateDir" : "템플릿 디렉터리",                        
+		"FontDir" : "폰트 디렉터리",                        
+		"ImageDir" : "이미지 디렉터리",                        
+		"ExternalBinaryDir" : "외부 바이너리 디렉터리",                                      
+		"DataBackupDir" : "데이터 백업 디렉터리",
 
-		"LogLevel" : "LogLevel",                        
-		"ApBrokerRetryTimingSecond" : "ApBrokerRetryTimingSecond",                        
-		"ImgGenThreadCount" : "ImgGenThreadCount",                     
-		"ImgGenReqPort" : "ImgGenReqPort",                        
-		"ImgGenRespPort" : "ImgGenRespPort",                        
-		"ImgGenPubPort" : "ImgGenPubPort",                        
-		"EslApTimerReqPort" : "EslApTimerReqPort",                        
-		"DeassignThreadCount" : "DeassignThreadCount",                      
-		"FontFacePreloadCount" : "FontFacePreloadCount",                 
+		"LogLevel" : "로그 레벨",                        
+		"ApBrokerRetryTimingSecond" : "APBroker 재시도 타이밍 (초)",                        
+		"ImgGenThreadCount" : "이미지 생성 스레드 수",                     
+		"ImgGenReqPort" : "이미지 생성 요청 포트",                        
+		"ImgGenRespPort" : "이미지 생성 응답 포트",                        
+		"ImgGenPubPort" : "이미지 생성 공용 포트",                        
+		"EslApTimerReqPort" : "Esl Ap 타이머 요청 포트",                        
+		"DeassignThreadCount" : "할당 취소 스레드 수",                      
+		"FontFacePreloadCount" : "폰트 면 프리로드 수",                 
 	
-		"LastTaskIdBackupFile" : "LastTaskIdBackupFile",                        
-		"ProductDataBackupFile" : "ProductDataBackupFile",                           
-		"NfcDataBackupFile" : "NfcDataBackupFile",                        
-		"EventFrameTxTiming" : "EventFrameTxTiming",                     
-		"TagImageTxTimging" : "TagImageTxTimging",                       
-		"ScanProfile" : "ScanProfile",                        
-		"BackoffBase" : "BackoffBase",                        
-		"BackoffMulFactor" : "BackoffMulFactor",                        
-		"FreezerTagMultiplier" : "FreezerTagMultiplier",                        
-		"TagDistributionMinute" : "TagDistributionMinute",                        
-		"PageRotationMacPage" : "PageRotationMacPage",                        
+		"LastTaskIdBackupFile" : "마지막 작업 ID 백업 파일",                        
+		"ProductDataBackupFile" : "제품 데이터 백업 파일",  
+		"AssignDataBackupFile" : "어싸인 데이터 백업 파일",                         
+		"NfcDataBackupFile" : "Nfc 데이터 백업 파일",                        
+		"EventFrameTxTiming" : "이벤트 프레임 Tx 타이밍",                     
+		"TagImageTxTimging" : "태그 이미지 TxT 타이밍",                       
+		"ScanProfile" : "스캔 프로필",                        
+		"BackoffBase" : "백오프 베이스",                        
+		"BackoffMulFactor" : "백오프 Mul 요소",                        
+		"FreezerTagMultiplier" : "냉동 태그 승수",                        
+		"TagDistributionMinute" : "태그 분포 분",                        
+		"PageRotationMacPage" : "페이지 회전 Mac 페이지",                        
 	
-		"LogMaxSizeMb" : "LogMaxSizeMb",                       
-		"LogMaxBackup" : "LogMaxBackup",                       
-		"LogMaxAgeDays" : "LogMaxAgeDays",                        
-		"LogCompress" : "LogCompress",                        
-		"GRpcMaxSize" : "GRpcMaxSize", 
+		"LogMaxSizeMb" : "로그 최대 크기(Mb)",                       
+		"LogMaxBackup" : "로그 최대 백업",                       
+		"LogMaxAgeDays" : "로그 최대 기간(일)",                        
+		"LogCompress" : "로그 압축",                        
+		"GRpcMaxSize" : "GRpc 최대 크기", 
 		
-		"SiteId" : "SiteId",
-		"SiteCode" : "SiteCode",
-		"StoreCode" : "StoreCode",
+		"SiteId" : "사이트 ID",
+		"SiteCode" : "사이트 코드",
+		"StoreCode" : "스토어 코드",
 		"Ip" : "Ip",
-		"DefaultGwIP" : "DefaultGwIP",
-		"Netmask" : "Netmask",
-		"NameServers" : "NameServers",
-		"TimeZone" : "TimeZone",
-		"TimeServerUrls" : "TimeServerUrls",
-		"InterApPort" : "InterApPort",
-		"InterApPortTarget" : "InterApPortTarget",
-		"ApBrokerUrl" : "ApBrokerUrl",
-		"EthernetInterface" : "EthernetInterface",
+		"DefaultGwIP" : "기본 GwIP",
+		"Netmask" : "넷마스크",
+		"NameServers" : "서버 이름",
+		"TimeZone" : "표준 시간대",
+		"TimeServerUrls" : "타임 서버 URL",
+		"InterApPort" : "인터 AP 포트",
+		"InterApPortTarget" : "인터 AP 포트 대상",
+		"ApBrokerUrl" : "AP 브로커 URL",
+		"EthernetInterface" : "이더넷 인터페이스",
 		}
 )
 
@@ -161,6 +163,20 @@ func removeWhiteSpace(Arr []string) []string {
 		}
 	}
 	return result
+}
+
+func determineLanguage() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		langCookie, err := ctx.Cookie("language")
+		if err != nil {
+			ctx.Set("language", "en")
+			currentLang = "en"
+		} else {
+			ctx.Set("language", langCookie)
+			currentLang = langCookie
+		}
+		ctx.Next()
+	}
 }
 
 func readNetworkConfig(ctx *gin.Context) {
@@ -363,7 +379,18 @@ func generateHTMLForm(data interface{}) template.HTML {
 		if !value.CanInterface() {
 			continue
 		}
-		formHTML += fmt.Sprintf("<div class=\"col-6 container\">\n<label class= \"form-label\" for = \"%s\">%s</label>\n", fieldName, enNames[fieldName])
+		fieldDisplayName := ""
+		switch {
+		case currentLang == "en":
+			fieldDisplayName = enNames[fieldName]
+		case currentLang == "kr":
+			fieldDisplayName = krNames[fieldName]
+		default: 
+			fieldDisplayName = enNames[fieldName]
+		}
+		 
+
+		formHTML += fmt.Sprintf("<div class=\"col-6 container\">\n<label class= \"form-label\" for = \"%s\">%s</label>\n", fieldName, fieldDisplayName)
 		switch value.Kind() {
 		case reflect.String:
 			v := addQuotationLiteral(value.String())
@@ -419,8 +446,9 @@ func main() {
 	router.SetFuncMap(template.FuncMap{
 		"generateHTMLForm": generateHTMLForm,
 	})
-	router.LoadHTMLGlob("templates/*")
 	router.Static("/scripts", "./scripts")
+	router.LoadHTMLGlob("templates/*")
+	
 
 	//custom middleware to handle error 500
 	router.Use(func (ctx *gin.Context) {
@@ -433,6 +461,9 @@ func main() {
 		}()
 		ctx.Next()
 	})
+
+	//detects user language
+	router.Use(determineLanguage())
 
 	//initial load
 	router.GET("/", func(ctx *gin.Context) {
