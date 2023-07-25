@@ -18,8 +18,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li><a class="nav-link" href="network">Network</a></li>
-          <li><a class="nav-link" href="operation">Operation</a></li>
+          <li><a class="nav-link" id = "networkNav" href="network">Network</a></li>
+          <li><a class="nav-link" id = "operationNav" href="operation">Operation</a></li>
         </ul>
           
         <ul class = "navbar-nav ml-auto">
@@ -41,13 +41,27 @@
     <div class = "row">
       <div class = "col text-center">
         <h1 class = "display-1 fw-bold "><strong>500</strong></h1>
-        <p class="fs-3">Internal Server Error</p>
-        <p class = "py-3">The server failed to load your request. Please try again later.</p>
-        <a href="network" class=" mx-4 btn btn-primary btn-lg" role = "button">Network</a>
-        <a href="operation" class=" mx-4 btn btn-primary btn-lg" role = "button">Operation</a>
+        <p class="fs-3" id = "errormsg1">Internal Server Error</p>
+        <p class = "py-3" id = "errormsg2">The server failed to load your request. Please try again later.</p>
+        <a href="network" class=" mx-4 btn btn-primary btn-lg" role = "button" id = "errorNetwork">Network</a>
+        <a href="operation" class=" mx-4 btn btn-primary btn-lg" role = "button" id = "errorOperation">Operation</a>
       </div>
     </div>
   </div>
   <script src="/scripts/displaySelected.js"></script>
+  <script>
+    let siteTitle = document.querySelector("title");
+    let errormsg1 = document.querySelector("#errormsg1");
+    let errormsg2 = document.querySelector("#errormsg2");
+    let errorNetwork = document.querySelector("#errorNetwork");
+    let errorOperation = document.querySelector("#errorOperation");
+    if (currentLang === "kr") {
+      siteTitle.textContent = "오류";
+      errormsg1.textContent = "내부 서버 오류";
+      errormsg2.textContent = "서버에서 요청을 불러오지 못했습니다. 나중에 다시 시도하십시오.";
+      errorNetwork.textContent = "네트워크";
+      errorOperation.textContent = "오퍼레이션";
+    }
+  </script>  
 </body>
 </html>

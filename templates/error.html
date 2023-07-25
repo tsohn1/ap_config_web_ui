@@ -18,8 +18,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li><a class="nav-link" href="network">Network</a></li>
-          <li><a class="nav-link" href="operation">Operation</a></li>
+          <li><a class="nav-link" id = "networkNav" href="network">Network</a></li>
+          <li><a class="nav-link" id = "operationNav" href="operation">Operation</a></li>
         </ul>
           
         <ul class = "navbar-nav ml-auto">
@@ -38,10 +38,22 @@
   </nav>
   
   <div class = "text-center py-5 px-4 justify-content-center">
-    <h1 class = "display-1 py-5"><strong>Error</strong></h1>
+    <h1 class = "display-1 py-5" id = "errorHeader"><strong>Error</strong></h1>
     <h2 class = "py-3">{{ .errorMessage }}</h2>
-    <a href="network" class=" mx-4 btn btn-primary btn-lg" role = "button">Network</a>
-    <a href="operation" class=" mx-4 btn btn-primary btn-lg" role = "button">Operation</a>
-    <script src="/scripts/displaySelected.js"></script>
-</body>
+    <a href="network" class=" mx-4 btn btn-primary btn-lg" role = "button" id = "errorNetwork">Network</a>
+    <a href="operation" class=" mx-4 btn btn-primary btn-lg" role = "button" id = "errorOperation">Operation</a>
+  <script src="/scripts/displaySelected.js"></script>
+  <script>
+    let siteTitle = document.querySelector("title");
+    let errorHeader = document.querySelector("#errorHeader");
+    let errorNetwork = document.querySelector("#errorNetwork");
+    let errorOperation = document.querySelector("#errorOperation");
+    if (currentLang === "kr") {
+      siteTitle.textContent = "오류";
+      errorHeader.textContent = "오류";
+      errorNetwork.textContent = "네트워크";
+      errorOperation.textContent = "오퍼레이션";
+    }
+  </script>  
+  </body>
 </html>

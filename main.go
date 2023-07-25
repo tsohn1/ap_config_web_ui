@@ -184,7 +184,11 @@ func readNetworkConfig(ctx *gin.Context) {
 	parsedNetworkEnv, err := config.GetConfigEnv(config.NETWORK_ENV, &networkEnv)
 	if err != nil {
 		log.Println("readNetworkConfig Error:", err)
-		errorMessage = "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
+		if currentLang == "kr" {
+			errorMessage = "데이터를 불러오지 못했습니다.\n파일이 필요한 사양과 일치하는지 확인하고 나중에 다시 시도하십시오."
+		} else {
+			errorMessage = "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
+		}
 		ctx.Redirect(http.StatusFound, "/error")
 		return
 	}
@@ -202,7 +206,11 @@ func updateNetworkConfig(ctx *gin.Context) {
 	if err != nil {
 		// Handle the error, possibly by returning an error response
 		log.Println("updateNetworkConfig Error:", err)
-		errorMessage = "Failed to submit data.\nPlease try again later."
+		if currentLang == "kr" {
+			errorMessage = "데이터를 제출하지 못했습니다.\n나중에 다시 시도하십시오."
+		} else {
+			errorMessage = "Failed to submit data.\nPlease try again later."
+		}
 		ctx.Redirect(http.StatusFound, "/error")
 		return
 	}
@@ -234,7 +242,11 @@ func updateNetworkConfig(ctx *gin.Context) {
 			num, err := strconv.Atoi(formFields.Get(field.Name))
 			if err != nil {
 				log.Println("updateNetworkConfigAtoi: during loop", err)
-				errorMessage = "Failed to handle submitted data.\nPlease try again later."
+				if currentLang == "kr" {
+					errorMessage = "제출된 데이터를 처리하지 못했습니다.\n나중에 다시 시도하십시오."
+				} else {
+					errorMessage = "Failed to handle submitted data.\nPlease try again later."
+				}
 				ctx.Redirect(http.StatusFound, "/error")
 				return
 			}
@@ -246,7 +258,11 @@ func updateNetworkConfig(ctx *gin.Context) {
 
 	if err != nil {
 		log.Println("updateNetworkConfig  SetConfigEnv Error:", err)
-		errorMessage = "Failed to submit data.\nPlease try again later."
+		if currentLang == "kr" {
+			errorMessage = "데이터를 제출하지 못했습니다.\n나중에 다시 시도하십시오."
+		} else {
+			errorMessage = "Failed to submit data.\nPlease try again later."
+		}
 		ctx.Redirect(http.StatusFound, "/error")
 		return
 	}
@@ -269,7 +285,11 @@ func readOperationConfig(ctx *gin.Context) {
 	parsedOperationEnv, err := config.GetConfigEnv(config.OPERATION_ENV, &operationEnv)
 	if err != nil {
 		log.Println("readOperationConfig Error:", err)
-		errorMessage = "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
+		if currentLang == "kr" {
+			errorMessage = "데이터를 불러오지 못했습니다.\n파일이 필요한 사양과 일치하는지 확인하고 나중에 다시 시도하십시오."
+		} else {
+			errorMessage = "Failed to retrieve data.\nPlease check to see if the file matches the required specifications and try again later."
+		}
 		ctx.Redirect(http.StatusFound, "/error")
 		return
 	}
@@ -286,7 +306,12 @@ func updateOperationConfig(ctx *gin.Context) {
 	err := ctx.Request.ParseForm()
 	if err != nil {
 		log.Println("Error: ctx.Request.ParseForm()", err)
-		errorMessage = "Failed to parse form.\nPlease try again later."
+		if currentLang == "kr" {
+			errorMessage = "폼을 구문 분석을 실패했습니다.\n나중에 다시 시도하십시오."
+		} else {
+			errorMessage = "Failed to parse form.\nPlease try again later."		
+		}
+		
 		ctx.Redirect(http.StatusFound, "/error")
 		return
 	}
@@ -306,7 +331,11 @@ func updateOperationConfig(ctx *gin.Context) {
 			ScanProfileVal[i], err = strconv.Atoi(val)
 			if err != nil {
 				log.Printf("updateOperationConfig Atoi Err:%v", err)
-				errorMessage = "Failed to handle submitted data.\nPlease try again later."
+				if currentLang == "kr" {
+					errorMessage = "제출된 데이터를 처리하지 못했습니다.\n나중에 다시 시도하십시오."
+				} else {
+					errorMessage = "Failed to handle submitted data.\nPlease try again later."
+				}
 		 		ctx.Redirect(http.StatusFound, "/error")	
 				return
 			}
@@ -326,7 +355,11 @@ func updateOperationConfig(ctx *gin.Context) {
 			num, err := strconv.Atoi(formFields.Get(field.Name))
 			if err != nil {
 				log.Printf("updateOperationConfig Atoi Err:%v", err)
-				errorMessage = "Failed to handle submitted data.\nPlease try again later."
+				if currentLang == "kr" {
+					errorMessage = "제출된 데이터를 처리하지 못했습니다.\n나중에 다시 시도하십시오."
+				} else {
+					errorMessage = "Failed to handle submitted data.\nPlease try again later."
+				}
 				ctx.Redirect(http.StatusFound, "/error")
 				return
 			}
@@ -347,7 +380,11 @@ func updateOperationConfig(ctx *gin.Context) {
 
 	if err != nil {
 		log.Println("updateOperationConfig SetConfig Env Error:", err)
-		errorMessage = "Failed to submit data.\nPlease try again later."
+		if currentLang == "kr" {
+			errorMessage = "데이터를 제출하지 못했습니다.\n나중에 다시 시도하십시오."
+		} else {
+			errorMessage = "Failed to submit data.\nPlease try again later."
+		}
 		ctx.Redirect(http.StatusFound, "/error")
 		return
 	}

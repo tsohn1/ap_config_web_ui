@@ -18,8 +18,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li><a class="nav-link" href="network">Network</a></li>
-          <li><a class="nav-link" href="operation">Operation</a></li>
+          <li><a class="nav-link" id = "networkNav" href="network">Network</a></li>
+          <li><a class="nav-link" id = "operationNav" href="operation">Operation</a></li>
         </ul>
           
         <ul class = "navbar-nav ml-auto">
@@ -39,7 +39,7 @@
   </nav>  
   <div class = "container py-5">
     <div class = "row container">
-      <h1 class = "text-center"><strong>YAML Configuration</strong> </h1>
+      <h1 class = "text-center" id="pageTitle"><strong>Network YAML Configuration</strong> </h1>
     </div>
     
     
@@ -47,12 +47,22 @@
       <div class = "row row-gap-3 gy-5">
         {{ generateHTMLForm .YAMLData}}
         <div class = "row container">
-          <button type = "submit" class = "mt-3 col-8 offset-2 btn btn-primary ">Save</button>
+          <button type = "submit" class = "mt-3 col-8 offset-2 btn btn-primary " id="submitButton">Save</button>
         </div>
       </div>
 
     </form>  
   </div>
   <script src="/scripts/displaySelected.js"></script>
+  <script>
+    let siteTitle = document.querySelector("title");
+    let pageTitle = document.querySelector("#pageTitle");
+    let submit = document.querySelector("#submitButton");
+    if (currentLang === "kr") {
+      siteTitle.textContent = "네트워크 YAML 설정";
+      pageTitle.textContent = "네트워크 YAML 설정";
+      submit.textContent = "저장";
+    }
+  </script>
 </body>
 </html>

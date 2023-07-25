@@ -18,8 +18,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li><a class="nav-link" href="network">Network</a></li>
-          <li><a class="nav-link" href="operation">Operation</a></li>
+          <li><a class="nav-link" id = "operationNav" href="network">Network</a></li>
+          <li><a class="nav-link" id = "networkNav" href="operation">Operation</a></li>
         </ul>
           
         <ul class = "navbar-nav ml-auto">
@@ -28,8 +28,8 @@
               Language
             </a>
             <ul class = "dropdown-menu" aria-labelledby="languageDropdown">
-              <li><a class = "dropdown-item" data-language = "en" href="#">English</a></li>
-              <li><a class = "dropdown-item" data-language = "kr" href="#">한국어</a></li>
+              <li><a class = "dropdown-item" data-language = "en"  href="#">English</a></li>
+              <li><a class = "dropdown-item" data-language = "kr"  href="#">한국어</a></li>
             </ul>
           </li>
         </ul>
@@ -41,13 +41,27 @@
     <div class = "row">
       <div class = "col text-center">
         <h1 class = "display-1 fw-bold "><strong>404</strong></h1>
-        <p class="fs-3">Page not found.</p>
-        <p class = "py-3">The page you're looking for doesn't exist.</p>
-        <a href="network" class=" mx-4 btn btn-primary btn-lg" role = "button">Network</a>
-        <a href="operation" class=" mx-4 btn btn-primary btn-lg" role = "button">Operation</a>
+        <p class="fs-3" id="errormsg1">Page not found.</p>
+        <p class = "py-3" id = "errormsg2">The page you're looking for doesn't exist.</p>
+        <a href="network" class=" mx-4 btn btn-primary btn-lg" role = "button" id = "errorNetwork">Network</a>
+        <a href="operation" class=" mx-4 btn btn-primary btn-lg" role = "button" id = "errorOperation">Operation</a>
       </div>
     </div>
   </div>
   <script src="/scripts/displaySelected.js"></script>
+  <script>
+    let siteTitle = document.querySelector("title");
+    let errormsg1 = document.querySelector("#errormsg1");
+    let errormsg2 = document.querySelector("#errormsg2");
+    let errorNetwork = document.querySelector("#errorNetwork");
+    let errorOperation = document.querySelector("#errorOperation");
+    if (currentLang === "kr") {
+      siteTitle.textContent = "오류";
+      errormsg1.textContent = "페이지를 찾을 수 없습니다.";
+      errormsg2.textContent = "찾고 있는 페이지가 존재하지 않습니다.";
+      errorNetwork.textContent = "네트워크";
+      errorOperation.textContent = "오퍼레이션";
+    }
+  </script>  
 </body>
 </html>
